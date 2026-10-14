@@ -10,8 +10,7 @@
     "logo.svg"
   ],
   "missing_artifacts": [
-    "THREAT_MODEL.md",
-    "REQUIREMENT_TEMPLATE.md"
+    "THREAT_MODEL.md"
   ],
   "process": "Remaining choices delegated to the assistant by the user; preserve direct answers, resolve owning specifications, keep only explicitly requested deferrals, and verify references/coverage before PR and merge.",
   "queue": [
@@ -991,7 +990,7 @@
     "OD-015 is the only deferred work.",
     "SC-003 and SC-006 are inapplicable under explicit scope decisions; other original rules are complete normative obligations.",
     "Acceptance and control coverage are in the owning specifications.",
-    "Threat model, requirement template and logo were not modified.",
+    "Threat model was not created; requirement template and logo were not modified.",
     "Five-file inventory and ownership findings are in specification-audit.json."
   ],
   "authorization": [

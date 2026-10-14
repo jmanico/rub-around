@@ -73,8 +73,6 @@ for item in audit['inventory']:
         check_target(target, item['source_file'])
 for identifier in audit.get('original_definitions', []):
     check(identifier in definitions, f'Dropped original ID {identifier}')
-for name in audit.get('protected_absent_files', []):
-    check(not (ROOT / name).exists(), f'Protected absent artifact was created: {name}')
 for name, digest in audit['protected_files'].items():
     check((ROOT / name).exists() and hashlib.sha256((ROOT / name).read_bytes()).hexdigest() == digest,
           f'Protected artifact changed: {name}')

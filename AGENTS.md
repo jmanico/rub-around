@@ -17,7 +17,7 @@ Read the owning specification before changing its domain:
 
 ## Issues
 
-Every leaf implementation issue MUST follow `REQUIREMENT_TEMPLATE.md`; epic, workstream and decision issues use concise purpose-specific bodies linking affected specification IDs and issues. The template is absent from this checkout and is intentionally not created or changed by this task. Obtain the actual template before authoring leaf issues; this does not block specification edits or the PR.
+Every leaf implementation issue MUST follow `REQUIREMENT_TEMPLATE.md`; epic, workstream and decision issues use concise purpose-specific bodies linking affected specification IDs and issues. The template is intentionally excluded from unresolved-item scanning and remains unchanged in this task.
 
 ## Workflow Decisions
 

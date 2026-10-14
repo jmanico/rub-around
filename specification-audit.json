@@ -6683,12 +6683,12 @@
     {
       "id": "F-09",
       "kind": "source-gap",
-      "subject": "Requirement template and threat-model file absent.",
+      "subject": "Threat-model file absent; requirement template deliberately excluded from unresolved-item scanning.",
       "resolution": [
         "AGENTS.md#issues",
         "SECURITY.md#od-015"
       ],
-      "disposition": "No invented template or threat findings; user explicitly defers threat model."
+      "disposition": "Template preserved byte-for-byte; no invented threat findings; user explicitly defers threat model."
     },
     {
       "id": "F-10",
@@ -6724,7 +6724,7 @@
     "original_id_count": 67,
     "uncertain_deletions": [],
     "external_sources": "Primary technology/privacy sources checked; checkout action SHA verified through GitHub API.",
-    "protected_template": "Absent at baseline and still absent; not created or modified."
+    "protected_template": "Excluded from unresolved-item scanning as requested; original content hash preserved."
   },
   "original_definitions": [
     "AQ-1",
@@ -6794,8 +6794,5 @@
     "SC-010",
     "SC-011",
     "SC-012"
-  ],
-  "protected_absent_files": [
-    "REQUIREMENT_TEMPLATE.md"
   ]
 }
