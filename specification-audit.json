@@ -6794,5 +6794,8 @@
     "SC-010",
     "SC-011",
     "SC-012"
+  ],
+  "protected_absent_files": [
+    "REQUIREMENT_TEMPLATE.md"
   ]
 }
