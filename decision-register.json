@@ -1,0 +1,1160 @@
+{
+  "scan_date": "2026-10-14",
+  "excluded": "REQUIREMENT_TEMPLATE.md",
+  "scanned_files": [
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "DESIGN.md",
+    "REQUIREMENTS.md",
+    "SECURITY.md",
+    "logo.svg"
+  ],
+  "missing_artifacts": [
+    "THREAT_MODEL.md",
+    "REQUIREMENT_TEMPLATE.md"
+  ],
+  "process": "Remaining choices delegated to the assistant by the user; preserve direct answers, resolve owning specifications, keep only explicitly requested deferrals, and verify references/coverage before PR and merge.",
+  "queue": [
+    {
+      "order": 1,
+      "decision_id": "OQ-11",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Supported app platforms",
+      "related": [
+        "AQ-1",
+        "DQ-2",
+        "OD-002"
+      ],
+      "status": "RESOLVED",
+      "answer": "iPhone and Android",
+      "answer_source": "USER",
+      "resolution_reference": "REQUIREMENTS.md#oq-11",
+      "record": "User answer retained verbatim."
+    },
+    {
+      "order": 2,
+      "decision_id": "OQ-7",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Meaning of “mark the app”",
+      "related": [
+        "AQ-10"
+      ],
+      "status": "RESOLVED",
+      "answer": "they can mark in some way, where the map is in error, also they can mark obstacles, obstructions, incorrect map items and similar.",
+      "answer_source": "USER",
+      "resolution_reference": "REQUIREMENTS.md#oq-7",
+      "record": "User answer retained verbatim."
+    },
+    {
+      "order": 3,
+      "decision_id": "OQ-10",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Actions allowed without signing in",
+      "related": [
+        "AQ-9",
+        "OD-009"
+      ],
+      "status": "RESOLVED",
+      "answer": "view the map, get directions only. Specifically they CANNOT report problems as anonymous.",
+      "answer_source": "USER",
+      "resolution_reference": "REQUIREMENTS.md#oq-10",
+      "record": "User answer retained verbatim."
+    },
+    {
+      "order": 4,
+      "decision_id": "OQ-10",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Roles and permissions for each protected action",
+      "related": [
+        "OD-009",
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-10",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 5,
+      "decision_id": "OQ-10",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Student eligibility and evidence needed to prove it",
+      "related": [
+        "OD-009"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-10",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 6,
+      "decision_id": "OQ-1",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Meaning of shortest route",
+      "related": [
+        "AQ-4",
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-1",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 7,
+      "decision_id": "OQ-5",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Meaning of safer paths",
+      "related": [
+        "AQ-4",
+        "DQ-4"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-5",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 8,
+      "decision_id": "OQ-5",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Mobility needs beyond elevators",
+      "related": [
+        "AQ-4",
+        "DQ-4"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-5",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 9,
+      "decision_id": "OQ-1",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Priority of distance, weather, and mobility constraints",
+      "related": [
+        "AQ-4"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-1",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 10,
+      "decision_id": "OQ-2",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Weather conditions that trigger indoor routing",
+      "related": [
+        "AQ-5"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-2",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 11,
+      "decision_id": "OQ-2",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "How weather is determined",
+      "related": [
+        "AQ-5",
+        "OD-014"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-2",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 12,
+      "decision_id": "OQ-3",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Behavior when no route satisfies requested constraints",
+      "related": [
+        "AQ-4",
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-3",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 13,
+      "decision_id": "OQ-4",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "How cross-building floor changes are explained",
+      "related": [
+        "AQ-6",
+        "DQ-3"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-4",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 14,
+      "decision_id": "OQ-9",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Unknown typed room handling",
+      "related": [
+        "AQ-6",
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-9",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 15,
+      "decision_id": "OQ-9",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Ambiguous typed room handling",
+      "related": [
+        "AQ-6",
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-9",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 16,
+      "decision_id": "OQ-8",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Required suggestion fields and attribution",
+      "related": [
+        "AQ-7",
+        "DQ-6",
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-8",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 17,
+      "decision_id": "OQ-8",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Submission outcome, review, and map publication authority",
+      "related": [
+        "AQ-3",
+        "AQ-7",
+        "OD-009",
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-8",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 18,
+      "decision_id": "OQ-6",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Accessibility standard and conformance level",
+      "related": [
+        "AQ-8",
+        "DQ-4",
+        "OD-013"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-6",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 19,
+      "decision_id": "OQ-6",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Visual aids and other accessibility behavior",
+      "related": [
+        "DQ-4"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-6",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 20,
+      "decision_id": "OQ-13",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Positioning scope and GPS behavior",
+      "related": [
+        "AQ-5",
+        "OD-014"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-13",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 21,
+      "decision_id": "OQ-14",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Offline behavior",
+      "related": [
+        "AQ-5",
+        "OD-014"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-14",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 22,
+      "decision_id": "OQ-12",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Personal data collected and linkage between identity and location",
+      "related": [
+        "AQ-9",
+        "OD-010"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-12",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 23,
+      "decision_id": "OQ-12",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Permitted data use and recipients",
+      "related": [
+        "OD-010"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-12",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 24,
+      "decision_id": "OQ-12",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Storage, logging, retention, and deletion for each data category",
+      "related": [
+        "AQ-9",
+        "OD-010"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-12",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 25,
+      "decision_id": "OQ-12",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "Applicable privacy obligations and verified basis",
+      "related": [
+        "OD-010"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-12",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 26,
+      "decision_id": "AQ-3",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Authoritative map source and permitted use",
+      "related": [
+        "OD-014",
+        "DESIGN.md Shapes"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-3",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 27,
+      "decision_id": "AQ-3",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Map format, geometry, coordinates, floor conventions, and completeness",
+      "related": [
+        "AQ-6",
+        "OD-014"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-3",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 28,
+      "decision_id": "AQ-3",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Map acquisition, validation, freshness, and updates",
+      "related": [
+        "OD-012",
+        "OD-014"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-3",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 29,
+      "decision_id": "AQ-2",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Deployment environment",
+      "related": [
+        "OD-007"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-2",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 30,
+      "decision_id": "AQ-2",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Map size, traffic, concurrent requests, and writes",
+      "related": [
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-2",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 31,
+      "decision_id": "AQ-2",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Latency and availability targets",
+      "related": [
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-2",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 32,
+      "decision_id": "AQ-11",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Shared client, modular backend, component responsibilities and data ownership",
+      "related": [
+        "OD-011"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-11",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 33,
+      "decision_id": "AQ-11",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Dependency rules DR-1 through DR-6 and persistence boundaries",
+      "related": [
+        "OD-011"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-11",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 34,
+      "decision_id": "AQ-11",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "API trust boundaries, validation responsibilities, transport and diagnostics ownership",
+      "related": [
+        "OD-003",
+        "OD-011"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-11",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 35,
+      "decision_id": "AQ-1",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Node.js release version",
+      "related": [
+        "OD-001",
+        "OD-008"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-1",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 36,
+      "decision_id": "AQ-1",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "HTTP implementation and version; built-in HTTP versus framework",
+      "related": [
+        "OD-003"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-1",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 37,
+      "decision_id": "AQ-1",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "React Native version",
+      "related": [
+        "OD-002",
+        "OD-008"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-1",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 38,
+      "decision_id": "AQ-8",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Minimum OS versions and supported devices",
+      "related": [
+        "DQ-2",
+        "OD-004"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-8",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 39,
+      "decision_id": "OD-008",
+      "owner_file": "SECURITY.md",
+      "topic": "Language/compiler versions and host applicability: JavaScript, React, TypeScript, Kotlin, Swift",
+      "related": [
+        "AQ-1",
+        "AQ-8"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "SECURITY.md#od-008",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 40,
+      "decision_id": "OD-004",
+      "owner_file": "SECURITY.md",
+      "topic": "Native SDK/toolchain versions and native integration scope",
+      "related": [
+        "AQ-8",
+        "OD-008"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "SECURITY.md#od-004",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 41,
+      "decision_id": "AQ-11",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Synchronous HTTPS JSON API and request/response flows",
+      "related": [
+        "OD-011"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-11",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 42,
+      "decision_id": "AQ-2",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Relational records and graph model; database, driver, ORM and versions",
+      "related": [
+        "OD-006"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-2",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 43,
+      "decision_id": "AQ-4",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Routing algorithm, attributes, and request-time computation",
+      "related": [
+        "AQ-2"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-4",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 44,
+      "decision_id": "AQ-6",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Canonical identifiers and exact route request/result/error contracts",
+      "related": [
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-6",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 45,
+      "decision_id": "AQ-7",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Suggestion contract, validation, persistence acknowledgement and integrity",
+      "related": [
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-7",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 46,
+      "decision_id": "OD-005",
+      "owner_file": "SECURITY.md",
+      "topic": "Validation library and version",
+      "related": [
+        "AQ-6",
+        "AQ-7"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "SECURITY.md#od-005",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 47,
+      "decision_id": "OD-012",
+      "owner_file": "SECURITY.md",
+      "topic": "Request field bounds, parsing limits, and resource budgets",
+      "related": [
+        "AQ-2",
+        "AQ-6",
+        "AQ-7"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "SECURITY.md#od-012",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 48,
+      "decision_id": "AQ-5",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Weather and positioning providers, integration contracts, destinations and failures",
+      "related": [
+        "OD-014"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-5",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 49,
+      "decision_id": "AQ-9",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Identity provider, credentials and passkey adoption",
+      "related": [
+        "OD-004",
+        "OD-009"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-9",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 50,
+      "decision_id": "AQ-9",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Session mechanisms, lifecycle, enforcement, and local sensitive storage",
+      "related": [
+        "OD-009",
+        "OD-010"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-9",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 51,
+      "decision_id": "OD-007",
+      "owner_file": "SECURITY.md",
+      "topic": "Container adoption, builder/runtime/platform and build enforcement",
+      "related": [
+        "AQ-2"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "SECURITY.md#od-007",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 52,
+      "decision_id": "OD-008",
+      "owner_file": "SECURITY.md",
+      "topic": "Verify compatibility and choose eligible direct/transitive security packs",
+      "related": [
+        "OD-001",
+        "OD-002",
+        "OD-003",
+        "OD-004",
+        "OD-005",
+        "OD-006",
+        "OD-007"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "SECURITY.md#od-008",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 53,
+      "decision_id": "DQ-2",
+      "owner_file": "DESIGN.md",
+      "topic": "Interface languages",
+      "related": [
+        "AQ-8"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "DESIGN.md#dq-2",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 54,
+      "decision_id": "DQ-1",
+      "owner_file": "DESIGN.md",
+      "topic": "University branding and adoption of proposed identity, colors, type, shapes, logo and styling",
+      "related": [
+        "AQ-8"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "DESIGN.md#dq-1",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 55,
+      "decision_id": "DQ-3",
+      "owner_file": "DESIGN.md",
+      "topic": "Route presentation and inputs-before-results layout assumption",
+      "related": [
+        "AQ-8",
+        "OD-013"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "DESIGN.md#dq-3",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 56,
+      "decision_id": "DQ-2",
+      "owner_file": "DESIGN.md",
+      "topic": "Responsive layouts, breakpoints and native token conversion",
+      "related": [
+        "AQ-8",
+        "OD-013"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "DESIGN.md#dq-2",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 57,
+      "decision_id": "AQ-8",
+      "owner_file": "ARCHITECTURE.md",
+      "topic": "Map renderer, content formats, and browser/WebView scope",
+      "related": [
+        "DQ-3",
+        "OD-013"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "ARCHITECTURE.md#aq-8",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 58,
+      "decision_id": "DQ-4",
+      "owner_file": "DESIGN.md",
+      "topic": "Mobility controls, visual aids and safer-path wording",
+      "related": [
+        "OQ-5",
+        "OQ-6"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "DESIGN.md#dq-4",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 59,
+      "decision_id": "DQ-5",
+      "owner_file": "DESIGN.md",
+      "topic": "Control and focus dimensions",
+      "related": [
+        "AQ-8"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "DESIGN.md#dq-5",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 60,
+      "decision_id": "DQ-5",
+      "owner_file": "DESIGN.md",
+      "topic": "Logo minimum size and clearance",
+      "related": [
+        "DQ-1"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "DESIGN.md#dq-5",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 61,
+      "decision_id": "DQ-6",
+      "owner_file": "DESIGN.md",
+      "topic": "Suggestion validation, loading, success and failure states",
+      "related": [
+        "OQ-8",
+        "OD-012"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "DESIGN.md#dq-6",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 62,
+      "decision_id": "OD-001–OD-014",
+      "owner_file": "SECURITY.md",
+      "topic": "Decision owners for each security decision",
+      "related": [],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "SECURITY.md#resolved-security-decisions",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 63,
+      "decision_id": "WQ-1",
+      "owner_file": "AGENTS.md",
+      "topic": "Package manager",
+      "related": [],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "AGENTS.md#wq-1",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 64,
+      "decision_id": "WQ-1",
+      "owner_file": "AGENTS.md",
+      "topic": "Repository layout and setup/run commands",
+      "related": [],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "AGENTS.md#wq-1",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 65,
+      "decision_id": "WQ-2",
+      "owner_file": "AGENTS.md",
+      "topic": "Formatting, linting, testing and verification tooling/commands",
+      "related": [],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "AGENTS.md#wq-2",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 66,
+      "decision_id": "WQ-3",
+      "owner_file": "AGENTS.md",
+      "topic": "Branch, commit, pull request and review conventions",
+      "related": [],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "AGENTS.md#wq-3",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 67,
+      "decision_id": "WQ-4",
+      "owner_file": "AGENTS.md",
+      "topic": "CI and release procedures",
+      "related": [],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "AGENTS.md#wq-4",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 68,
+      "decision_id": "OQ-15",
+      "owner_file": "REQUIREMENTS.md",
+      "topic": "How students place or locate marks for map errors and obstacles",
+      "related": [
+        "OQ-7",
+        "OQ-8",
+        "AQ-7",
+        "DQ-6"
+      ],
+      "status": "RESOLVED",
+      "answer_source": "AGENT_SELECTED",
+      "resolution_reference": "REQUIREMENTS.md#oq-15",
+      "record": "Selected decision is recorded in the owning specification at resolution_reference."
+    },
+    {
+      "order": 69,
+      "decision_id": "OD-015",
+      "owner_file": "SECURITY.md",
+      "topic": "Threat model and finding coverage",
+      "status": "DEFERRED",
+      "answer_source": "USER",
+      "answer": "skip the threat model for now",
+      "resolution_reference": "SECURITY.md#od-015",
+      "blocks": [
+        "Threat-model authoring",
+        "Threat finding/control mappings",
+        "Claim of completed threat-model review"
+      ],
+      "resume_when": "User requests threat modeling."
+    }
+  ],
+  "answers": [
+    {
+      "decision_id": "OQ-11",
+      "queue_order": 1,
+      "answer_verbatim": "iPhone and Android",
+      "resolved_value": "Supported platforms: iPhone and Android.",
+      "scope": "Does not establish minimum OS versions, tablet support, or technology versions."
+    },
+    {
+      "decision_id": "OQ-7",
+      "queue_order": 2,
+      "answer_verbatim": "they can mark in some way, where the map is in error, also they can mark obstacles, obstructions, incorrect map items and similar.",
+      "resolved_value": "Students can mark locations of map errors, obstacles, obstructions, incorrect map items, and similar problems.",
+      "scope": "Mark placement, report details, visibility, review, and effects on routing remain undecided."
+    },
+    {
+      "decision_id": "OQ-10",
+      "queue_order": 3,
+      "answer_verbatim": "view the map, get directions only. Specifically they CANNOT report problems as anonymous.",
+      "resolved_value": "Anonymous users may view the map and get directions only. Reporting problems requires signing in.",
+      "scope": "Roles, student eligibility, authentication method, and map-edit permissions remain open."
+    },
+    {
+      "decision_id": "OD-015",
+      "answer_verbatim": "skip the threat model for now",
+      "status": "DEFERRED"
+    }
+  ],
+  "completion_checks": [
+    "All original decision topics resolve to owning entries.",
+    "OD-015 is the only deferred work.",
+    "SC-003 and SC-006 are inapplicable under explicit scope decisions; other original rules are complete normative obligations.",
+    "Acceptance and control coverage are in the owning specifications.",
+    "Threat model, requirement template and logo were not modified.",
+    "Five-file inventory and ownership findings are in specification-audit.json."
+  ],
+  "authorization": [
+    {
+      "instruction": "for the rest of these question just answer for me using your best guess, leave no unknowns.",
+      "effect": "Agent may select remaining decisions without an interview."
+    },
+    {
+      "instruction": "skip the threat model for now",
+      "effect": "OD-015 defers threat modeling only."
+    },
+    {
+      "instruction": "when done, pr and merge",
+      "effect": "Create and merge the reviewed PR."
+    }
+  ],
+  "source_inventory": {
+    "file": "specification-audit.json",
+    "original_matching_line_count": 161
+  },
+  "rule_dispositions": [
+    {
+      "id": "SC-001",
+      "status": "ACTIVE",
+      "reference": "SECURITY.md#sc-001",
+      "original_dependencies": [
+        "OD-001",
+        "OD-003",
+        "OD-008",
+        "OD-011",
+        "OD-012"
+      ]
+    },
+    {
+      "id": "SC-002",
+      "status": "ACTIVE",
+      "reference": "SECURITY.md#sc-002",
+      "original_dependencies": [
+        "OD-002",
+        "OD-008",
+        "OD-010",
+        "OD-011",
+        "OD-013"
+      ]
+    },
+    {
+      "id": "SC-003",
+      "status": "NOT APPLICABLE",
+      "reference": "SECURITY.md#sc-003",
+      "original_dependencies": [
+        "OD-004",
+        "OD-008",
+        "OD-009",
+        "OD-011"
+      ]
+    },
+    {
+      "id": "SC-004",
+      "status": "ACTIVE",
+      "reference": "SECURITY.md#sc-004",
+      "original_dependencies": [
+        "OD-001",
+        "OD-003",
+        "OD-005",
+        "OD-008",
+        "OD-011",
+        "OD-012"
+      ]
+    },
+    {
+      "id": "SC-005",
+      "status": "ACTIVE",
+      "reference": "SECURITY.md#sc-005",
+      "original_dependencies": [
+        "OD-001",
+        "OD-006",
+        "OD-008",
+        "OD-010",
+        "OD-011",
+        "OD-012"
+      ]
+    },
+    {
+      "id": "SC-006",
+      "status": "NOT APPLICABLE",
+      "reference": "SECURITY.md#sc-006",
+      "original_dependencies": [
+        "OD-007",
+        "OD-011"
+      ]
+    },
+    {
+      "id": "SC-007",
+      "status": "ACTIVE",
+      "reference": "SECURITY.md#sc-007",
+      "original_dependencies": [
+        "OD-001",
+        "OD-003",
+        "OD-008",
+        "OD-009",
+        "OD-011"
+      ]
+    },
+    {
+      "id": "SC-008",
+      "status": "ACTIVE",
+      "reference": "SECURITY.md#sc-008",
+      "original_dependencies": [
+        "OD-010",
+        "OD-011",
+        "OD-014"
+      ]
+    },
+    {
+      "id": "SC-009",
+      "status": "ACTIVE",
+      "reference": "SECURITY.md#sc-009",
+      "original_dependencies": [
+        "OD-001",
+        "OD-006",
+        "OD-008",
+        "OD-009",
+        "OD-011",
+        "OD-012"
+      ]
+    },
+    {
+      "id": "SC-010",
+      "status": "ACTIVE",
+      "reference": "SECURITY.md#sc-010",
+      "original_dependencies": [
+        "OD-001",
+        "OD-003",
+        "OD-008",
+        "OD-011",
+        "OD-014"
+      ]
+    },
+    {
+      "id": "SC-011",
+      "status": "ACTIVE",
+      "reference": "SECURITY.md#sc-011",
+      "original_dependencies": [
+        "OD-002",
+        "OD-008",
+        "OD-011",
+        "OD-013"
+      ]
+    },
+    {
+      "id": "SC-012",
+      "status": "ACTIVE",
+      "reference": "SECURITY.md#sc-012",
+      "original_dependencies": [
+        "OD-001",
+        "OD-002",
+        "OD-003",
+        "OD-004",
+        "OD-008",
+        "OD-009",
+        "OD-010",
+        "OD-011"
+      ]
+    }
+  ]
+}

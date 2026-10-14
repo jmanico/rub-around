@@ -1,140 +1,155 @@
 # Architecture
 
-This document owns how the system is built. [REQUIREMENTS.md](REQUIREMENTS.md) owns behavior; [DESIGN.md](DESIGN.md) owns visual, interaction, and frontend constraints. No implementation is assumed. Technical recommendations are **PROPOSED**, missing facts are **UNKNOWN**, and pending decisions are **TO BE DECIDED**.
+This file owns technology, components, interfaces, data flow and structural trust boundaries. Product semantics and failure behavior are in [REQUIREMENTS.md](REQUIREMENTS.md), visual conventions in [DESIGN.md](DESIGN.md), and all security controls in [SECURITY.md](SECURITY.md). Decisions below are selected implementation targets; this repository has no application implementation yet.
 
 ## Required Architecture Inputs
 
-| Field | Input or decision |
+| Input | Authoritative decision |
 | --- | --- |
-| Requirements source | [REQUIREMENTS.md](REQUIREMENTS.md). |
-| Design source | [DESIGN.md](DESIGN.md). |
-| Target surfaces | **UNKNOWN** in REQUIREMENTS.md. Developer inputs confirm iOS and Android; this source gap remains explicit (AQ-1). |
-| Runtime and deployment environment | Server runtime: **Node.js**, as supplied. Runtime version and deployment environment: **UNKNOWN** (AQ-1, AQ-2). |
-| Server framework | **Node.js**, exactly as supplied. This names a runtime rather than a separate web framework; the intended HTTP framework choice is **TO BE DECIDED** (AQ-1). |
-| Client framework(s) | **iOS and Android (React Native)**, as supplied. React Native version and supported OS versions: **UNKNOWN** (AQ-1, AQ-8). |
-| API style and integration model | **PROPOSED:** synchronous JSON request/response over HTTPS. Mapping software is confirmed by the architecture notes. Map sources and positioning/weather integrations are **UNKNOWN**; integration selection is **TO BE DECIDED** (AQ-3, AQ-5). |
-| Authentication and session model | Authentication, roles, and session requirements are **UNKNOWN**; whether sessions are needed and their model are **TO BE DECIDED** (OQ-10; AQ-9). |
-| Data model and scale expectations | Required entities: campus, buildings, building levels, rooms, outdoor areas, walkways, elevators, routes, maps, map change suggestions, weather conditions. **PROPOSED:** relational records plus a routing graph. Dataset size, concurrency, traffic, and performance targets are **UNKNOWN** (AQ-2). |
-| Security expectations | Requirements leave privacy and regulatory constraints **UNKNOWN**. Detailed controls and security-pack selection are deferred to `SECURITY.md`; select packs only for confirmed technology versions. No software versions have been supplied (AQ-9). |
+| Product requirements and acceptance | [REQUIREMENTS.md](REQUIREMENTS.md) |
+| Presentation and accessibility | [DESIGN.md](DESIGN.md) |
+| Client/server stack | AQ-1 |
+| Hosting, persistence and capacity | AQ-2 |
+| Map provenance and geometry | AQ-3 |
+| Routing model | AQ-4 |
+| Location, weather and connectivity adapters | AQ-5 |
+| Route and report interfaces | AQ-6, AQ-7 |
+| Native toolchain and renderer | AQ-8 |
+| Identity implementation | AQ-9 |
+| Components and dependency rules | AQ-11, DR-1–DR-6 |
+| Security enforcement | [SECURITY.md](SECURITY.md) |
 
-## Architecture and Decisions
+## Decisions
 
-**PROPOSED:** a shared React Native application, one modular Node.js backend, and one durable relational store. Centralize map interpretation and routing policy so both clients receive consistent routes.
+### AQ-1
 
-### Frameworks and API
+**RESOLVED — stack.** Use Node.js 24 LTS, Fastify 5.12, React Native 0.87, React 19.2, TypeScript 6.0, and Zod 4. Initial reviewed baselines are Node.js 24.21.0, React Native 0.87.1, React 19.2.3, and TypeScript 6.0.3. Exact installed patches belong in the generated lockfile; maintenance follows [SC-014](SECURITY.md#sc-014). This selects version lines without claiming an installation or build has happened.
 
-**PROPOSED:** use Node.js's built-in HTTP server facilities for the limited request/response API, pending clarification of the supplied framework value (AQ-1). The transport adapter must handle request parsing and validation explicitly because this API is low-level. [Node.js HTTP documentation](https://nodejs.org/api/http.html#http).
+Fastify supplies the HTTP lifecycle and plugin model instead of handwritten Node HTTP dispatch. Zod supplies shared runtime contracts. The native stack follows the [tagged React Native template](https://github.com/react-native-community/template/blob/0.87.1/template/package.json); the backend line is supported by the [Fastify LTS matrix](https://github.com/fastify/fastify/blob/main/docs/Reference/LTS.md) and [Node release schedule](https://github.com/nodejs/Release). TypeScript 7 is not selected merely because a security corpus includes it.
 
-**PROPOSED:** expose route requests and map suggestion submissions. Route requests carry a starting room, destination, and applicable routing context; the source of weather context is unresolved. Responses carry ordered route segments with building and level identifiers, plus map information required by the eventual presentation. Exact contracts, ambiguous-room outcomes, and unavailable-route responses are **TO BE DECIDED** (AQ-4, AQ-6, AQ-7).
+### AQ-2
 
-**PROPOSED:** keep request state and presentation shared between iOS and Android, with platform and map-rendering details behind frontend adapters. Preserve DESIGN.md's permitted color pairs, opaque backing for essential map labels/graphics, persistent labels, intact room identifiers, scalable text, flat layout, and focus treatment. Map presentation and renderer selection remain **TO BE DECIDED**; a map SDK must not determine routing policy.
+**RESOLVED — hosting, scale and storage.** Deploy one API instance on an AWS EC2 Ubuntu 24.04 LTS VM in Frankfurt (`eu-central-1`), initially 2 vCPU and 4 GiB RAM. Use the distribution-maintained Nginx package as the edge and systemd as the process supervisor. Use RDS PostgreSQL 17, initially single-AZ with 2 vCPU/4 GiB class capacity, and the JavaScript `pg` 8 driver with SQL migrations. No ORM, SQLite, Docker, Kubernetes or Redis in the first release. PostgreSQL supports concurrent review/account writes more directly than the earlier SQLite proposal; [its version policy](https://www.postgresql.org/support/versioning/) defines maintenance of the chosen line.
 
-Two source mismatches need resolution (AQ-8). DESIGN.md's web-oriented `rem` and font-stack tokens need explicit native translation; React Native uses density-independent numeric dimensions. [React Native dimension documentation](https://reactnative.dev/docs/height-and-width). DESIGN.md also names WCAG 2.2 AA contrast thresholds while REQUIREMENTS.md leaves overall conformance open. Preserve the contrast constraints; broader conformance remains **TO BE DECIDED**.
+Capacity fixture: one campus, up to 100 buildings, 1,000 levels, 30,000 rooms, 100,000 graph vertices and 300,000 directed edges. Plan for 10,000 daily users, 1,000 concurrent clients, 25 route requests/second steady, 100/second for a 60-second burst, and five durable writes/second. These are design budgets, not measured campus facts. Performance and recovery acceptance are NFR-1–NFR-4. Route workers use an in-memory immutable graph revision; two worker threads and a bounded job queue isolate graph computation from the API event loop. Resource enforcement is SC-001.
 
-### Persistence and Routing Model
+Repository layout: `apps/mobile`, `apps/api`, `packages/contracts`, `packages/domain`, `data/maps`, `ops`, and `tests`. Contracts contain DTOs and runtime schemas; domain contains graph and policy logic without framework imports. Operational commands belong to AGENTS.md WQ-1.
 
-**PROPOSED:** SQLite stores canonical map records and suggestions in separately owned tables, keeping persistence minimal. Suitability depends on the unknown workload and environment: SQLite permits only one writer at a time. [SQLite usage guidance](https://www.sqlite.org/whentouse.html#high_concurrency). Database and driver version selection is **TO BE DECIDED** (AQ-2).
+### AQ-3
 
-The proposed model has these boundaries:
+**RESOLVED — authoritative map pipeline.** The operator maintains an independently surveyed campus dataset with contributor permission under CC BY 4.0. University plans may be incorporated only with documented permission; no right to use an institutional plan is assumed. The first release uses no remote tile service, OSM import, geocoder or university-private floor plan. Actual surveys and permissions are release deliverables, not facts invented by this decision.
 
-- **Campus map:** rooms belong to levels within buildings; outdoor areas and route junctions have stable identifiers. Graph edges represent indoor/outdoor paths, elevators, and inter-building walkways. Each walkway endpoint references its own building and level; connectivity and elevation cannot be inferred from floor labels (FR-3.1). Map provenance, geometry, completeness, and update authority are **UNKNOWN** (AQ-3).
-- **Routing:** reads the map graph and derives routes. Indoor/outdoor classification supports FR-1.3, FR-1.4, and FR-4.1; elevator connections support FR-5.1. Offer qualifying routes where they exist. Cost definitions, constraint precedence, additional mobility attributes, and the search algorithm are **TO BE DECIDED** (AQ-4); unknown map attributes must not establish route suitability.
-- **Suggestions:** persist submissions separately from canonical map data. Submission does not itself authorize a map edit. Fields and subsequent handling remain **TO BE DECIDED** (AQ-7).
-- **Transient data:** keep route results, starting locations, mobility choices, and weather context request-scoped. Retention decisions remain in AQ-9.
+Store WGS84 coordinates for outdoor points and surveyed meter coordinates in a campus-local frame for indoor geometry, with a versioned transform between them. A level has an opaque stable ID, its building ID, display label and measured elevation; display labels do not imply physical connectivity. Map versions contain rooms, destinations, nodes, directed edges, geometry and provenance. Edge attributes include length, indoor classification, access class, stairs/ramp/elevator type, clearance width, slope, lighting evidence, closure state and observation timestamps. Absent survey measurements are explicit null data values; their product treatment is FR-5.3.
 
-### Authentication and Session Boundary
+The map module imports a bounded local GeoJSON-plus-graph bundle, produces a validation report and stages a version. A moderator publishes through the review workflow; one transaction advances the active version pointer. Clients refresh the manifest on foregrounding and at 30-second intervals while online. Publication also swaps the worker graph atomically. Review elevator/closure evidence daily and survey attributes every 90 days; eligibility uses the freshness policy in FR-5.6. Import and publication controls belong to SC-009 and SC-010.
 
-Authentication, including whether workflows allow anonymous access, is **TO BE DECIDED**. **PROPOSED:** if identity is required, verify it at the API boundary and enforce action permissions in the owning application module. Provider, session mechanism, credentials, and lifecycle depend on AQ-9; detailed controls belong in `SECURITY.md`.
+### AQ-4
 
-## Components and Flows
+**RESOLVED — solver.** Use Dijkstra on directed edges after applying the eligibility predicates defined by FR-1.6, FR-4.1–FR-4.4 and FR-5.1–FR-5.6. Cost is supplied by FR-1.5; break equal costs by lexicographic edge-ID sequence. Distances include measured vertical travel; do not derive them from floor-label arithmetic. Each request uses one immutable map revision. Compile routes into ordered segments referencing both endpoint levels. The solver returns an outcome union; product handling belongs to FR-1.7 and FR-1.8. There is no client-side route solver in this release.
 
-Status describes requirement support, not implementation or technology approval: **SUPPORTED** means the responsibility follows from requirements; **PARTIALLY DEFINED** means policy or presentation is unresolved; **TO BE DECIDED** means the integration or mechanism is unselected. All component boundaries below are **PROPOSED**.
+### AQ-5
 
-| Component | Status | Responsibility and business-rule enforcement | Data ownership | Requirement basis |
-| --- | --- | --- | --- | --- |
-| Mobile presentation and request state | PARTIALLY DEFINED | Capture route inputs and suggestions; render results under DESIGN.md; manual room entry cannot depend on GPS. Routing policy stays on the server. | Input drafts and displayed results only. | FR-1.1, FR-1.2, FR-2.1, FR-3.1, FR-6.1; unnumbered accessibility requirement. |
-| API adapter | SUPPORTED | Parse requests, validate their structure, and dispatch to application modules; identity enforcement remains conditional on AQ-9. | Transport data only. | FR-1.1, FR-1.2, FR-6.1. |
-| Campus map module | PARTIALLY DEFINED | Resolve room/destination identifiers; provide consistent graph connectivity and explicit building/level endpoints. Ambiguity policy remains open. | Canonical campus, building, level, room, outdoor-area, path, elevator, and map records. | FR-1.1, FR-1.2, FR-1.3, FR-1.4, FR-2.1, FR-3.1, FR-5.1. |
-| Routing module | PARTIALLY DEFINED | Apply routing costs and weather/mobility rules; compute qualifying routes from map data. Priorities and failure outcomes remain open. | Derived route results and request context; read-only access to map data. | FR-1.1, FR-1.2, FR-1.3, FR-1.4, FR-2.1, FR-3.1, FR-4.1, FR-5.1. |
-| Suggestion module | PARTIALLY DEFINED | Validate and accept suggestions under the eventual submission contract; cannot publish map changes. | Submitted suggestions. | FR-6.1. |
-| Persistence adapters | SUPPORTED | Translate owner-defined storage operations into database access; enforce record integrity, not routing policy. | Physical persistence only; logical ownership stays with map and suggestion modules. | FR-1.1, FR-1.2, FR-3.1, FR-6.1. |
-| Weather and positioning integration boundaries | TO BE DECIDED | Normalize inputs if integrations are selected. Weather determination is unresolved; GPS cannot be required for a typed-room origin. | External observations only; provider and retention are unresolved. | FR-4.1, FR-2.1; GPS mentioned in requirements inputs. |
+**RESOLVED — adapters.** Weather is a request-local selection with no weather vendor. Positioning uses a narrow native module over iOS Core Location and Android LocationManager; no indoor beacons, background service or third-party positioning SDK. The client maps a foreground fix to nearby outdoor graph nodes, then submits the confirmed node ID; raw device coordinates are not needed by the route API. The adapter implements the positioning outcome in FR-2.8. Location permissions and data handling are SC-002 and SC-008.
 
-### Main Data Flows and Trust Boundaries
+Cache the most recent public map bundle in the app's files; store its manifest and revision time beside it. Offline behavior is FR-8.3 and FR-8.4. The sole external transactional integration is Amazon SES in Frankfurt for authentication and account-lifecycle emails, invoked through AWS SDK for JavaScript v3. There are no user-supplied outbound destinations; enforcement belongs to SC-010. AWS resource names, DNS and sender identities are deployment configuration supplied by the operator, validated under SC-013 rather than fictitious values in this specification.
 
-1. **Route request:** student enters the starting room and destination; client state sends the request to the API. The routing module asks the map module to resolve identifiers and read the graph, then applies the agreed route policy. The result returns through the API into client state and presentation. Both endpoints of cross-building level transitions remain explicit throughout. FR-2.1 requires no GPS dependency; it does not establish offline operation.
-2. **Weather and mobility:** the routing module uses the established rain context and the student's elevator need to find the required qualifying routes. Weather determination, competing priorities, and unsatisfied constraints remain **TO BE DECIDED** (AQ-4, AQ-5). An unmet constraint must not be silently represented as satisfied.
-3. **Suggestion submission:** client draft crosses the API boundary into the suggestion module, which validates and persists it through its storage interface. **PROPOSED:** acknowledge acceptance only after persistence succeeds. This flow ends at submission; review and incorporation into the map are unresolved (AQ-7).
+### AQ-6
 
-The student-controlled device is outside server authority: client state cannot authorize actions or establish map truth. **PROPOSED:** the API validates transport inputs; owning modules validate identifiers, connectivity, route suitability, and eventual access permissions. Persistence is reachable only through owner-specific adapters. Future map, weather, or positioning inputs cross an external-data boundary and must be normalized before domain use. Their selection and trust policy remain open; privacy and detailed controls belong in `SECURITY.md`.
+**RESOLVED — API.** Use synchronous UTF-8 JSON request/response at `/v1` over the transport controlled by SC-001. Canonical entity IDs are opaque UUIDs. Room lookup uses a maintained alias index implementing FR-2.7.
+
+| Interface | Request/response structure | Product contract |
+| --- | --- | --- |
+| `GET /v1/map/manifest` | Active revision, timestamp, coverage, attribution and bundle hash | NFR-8 |
+| `GET /v1/map/versions/:id` | Geometry, display labels and public graph attributes; paginated by building/level | NFR-8 |
+| `POST /v1/rooms/resolve` | `{query, buildingId?}` → resolved ID, candidate list, or no match | FR-2.2, FR-2.3 |
+| `POST /v1/routes` | `{originId, destinationId, weather, indoor, mobility, wellLit}` → outcome union | FR-1.1–FR-5.6 |
+| `POST /v1/auth/challenges` | `{email}` → challenge receipt | FR-7.6 |
+| `POST /v1/auth/sessions` | `{challengeId, code}` → session DTO | FR-7.6 |
+| `POST /v1/auth/refresh` | Refresh credential → replacement session DTO | FR-7.7 |
+| `DELETE /v1/auth/session` | Current session → empty success | FR-7.7 |
+| `GET /v1/account/export` | Authenticated request → export receipt/download when ready | FR-7.8 |
+| `DELETE /v1/account` | Authenticated deletion → receipt | FR-7.8, FR-7.9 |
+
+The route outcome union is `route`, `no_route`, or `invalid_input`. A route DTO contains `mapVersion`, `distanceMeters`, ordered segments, per-segment `from`/`to` building and level IDs, canonical labels, geometry and instruction keys. Contract schemas define `weather = none | rain | snow_ice | wind` and `mobility = standard | elevator | step_free`; display wording is owned by DESIGN.md. Responses use localization keys and structured parameters, not server-generated HTML.
+
+Error envelopes contain `code`, optional field keys, and an opaque `requestId`. HTTP mapping: 400 invalid input, 401 unauthenticated, 403 forbidden, 404 resource not found, 409 conflict, 413 payload too large, 429 rate limited, and 503 unavailable; a valid no-route result is 200. Authentication-error enforcement is SC-012. Request budgets and validation enforcement are SC-001/SC-004.
+
+### AQ-7
+
+**RESOLVED — report interfaces and lifecycle.** `POST /v1/reports` receives `{category, location, description, observedAt}` and an `Idempotency-Key` header. `location` is the discriminated union `{kind: item, itemId}`, `{kind: point, buildingId, levelId, x, y}`, or `{kind: room, roomId}`. The report module assigns its UUID, owner and timestamps. `GET /v1/reports` lists the caller's reports; `GET /v1/reports/:id` returns its detail.
+
+Moderation uses `GET /v1/moderation/reports`, `POST /v1/moderation/reports/:id/review` and `POST /v1/map/publications`. Review requests contain an expected report version, action and reason; publication contains an expected active map revision and staged version ID. The review coordinator calls report and map interfaces; the report module itself cannot write canonical map data. A transaction commits review outcome, publication pointer and audit event together when publication is requested. Concurrent stale versions return conflict. Behavioral states, receipts and retries are defined only by FR-6.6–FR-6.13; authorization and integrity enforcement are SC-007/SC-009.
+
+### AQ-8
+
+**RESOLVED — native build and renderer.** Product OS support is owned by FR-8.7. Use React Native's New Architecture and bundled Hermes, Community CLI 20.2, CocoaPods (not experimental SwiftPM), Xcode 26 with Swift 6.2 compiler in Swift 5 language mode, JDK 17, Kotlin 2.2.0, AGP 9.2.1, compile SDK/build tools 37 and target SDK 36. Preserve the tagged template's compatible Gradle wrapper. The [tagged Android versions](https://github.com/react/react-native/blob/v0.87.1/packages/react-native/gradle/libs.versions.toml) and [release notes](https://reactnative.dev/blog/2026/08/11/react-native-0.87) support this baseline; store-policy and native build checks remain implementation evidence, not claimed results.
+
+Render surveyed floor geometry with `react-native-svg` 15 (minimum 15.13) using native vector primitives; no browser application, SSR or React Server Components; sink restrictions are owned by SC-011. The [renderer compatibility table](https://github.com/software-mansion/react-native-svg) covers the selected React Native range; both native builds must still be tested. Keep map drawing behind `MapRenderer` and location/credential operations behind narrow platform adapters. Token translation and rendering presentation belong to DQ-2/DQ-3; sink controls belong to SC-011.
+
+### AQ-9
+
+**RESOLVED — identity.** A dedicated identity module issues email challenges through SES and stores accounts and opaque sessions in PostgreSQL. The mobile app calls a narrow native credential adapter governed by SC-002. No passwords, university SSO, student-ID integration, passkeys, JWTs or browser cookies in this release. Authentication policy and all credential generation, storage, expiry, retry and recovery controls are authored in SC-012; permitted actions are FR-7.1–FR-7.11.
+
+Moderation uses a private operator CLI calling the same API interfaces from the management network. Role provisioning uses an operator-only command on the management host. No additional public admin frontend is required.
+
+### AQ-10
+
+**RESOLVED.** The previously ambiguous action is implemented by the report flow in AQ-7; its meaning is owned by [OQ-7](REQUIREMENTS.md#oq-7).
+
+### AQ-11
+
+**RESOLVED — components.** Adopt these boundaries and DR-1–DR-6. No component responsibility table grants access; controls are owned by SECURITY.md.
+
+| Component | Responsibility | Owned data |
+| --- | --- | --- |
+| Mobile presentation and state | Inputs, drafts, results and platform adapters | Session-local presentation state and public map cache |
+| API adapter | Transport DTO conversion and dispatch | No domain records |
+| Identity module | Challenge/session/account lifecycle | Account, credential-verifier and role records |
+| Map module | Lookup, imports, staged revisions and publication | Canonical map and revision records |
+| Routing module | Graph filtering and Dijkstra jobs | Request-local derived results |
+| Report module | Submission and review-state transitions | Reports and idempotency receipts |
+| Review coordinator | Compose report and map operations | No independent store |
+| Persistence adapters | Implement owner-specific interfaces and transaction context | No independent logical ownership |
+| Worker pool | Compute against a pinned graph revision | Read-only graph snapshots |
+| Operations jobs | Scheduled retention, backup and export orchestration | Job metadata through owner interfaces |
 
 ## Dependency Rules
 
-These **PROPOSED** rules define permitted directions and ownership:
+- **DR-1:** Presentation calls client state/use cases, then the API adapter; responses update state before rendering. Presentation has no persistence or authoritative routing dependency.
+- **DR-2:** Server adapters call application modules, which call domain policy and owner-defined data interfaces. Domain code imports no React Native, HTTP, SQL or vendor SDK APIs.
+- **DR-3:** Routing reads map data through the map interface; the map module never calls routing. Reports call neither routing nor canonical-map writes; the review coordinator composes the two owning interfaces.
+- **DR-4:** Each module owns its writes and exposes interfaces for reads. Storage adapters implement these interfaces and accept a coordinator-supplied transaction context; they never call workflows or bypass another owner's interface.
+- **DR-5:** Platform, persistence and service adapters implement interfaces defined by their consumers and translate vendor data at entry. The composition root may wire implementations without reversing dependency direction.
+- **DR-6:** Requests travel from presentation through application logic to domain/data interfaces; returned values do not reverse dependency direction. Module cycles and shared mutable stores bypassing ownership are forbidden.
 
-- **DR-1:** Mobile presentation sends actions to client state/use cases, which call the client API adapter. Responses update state before rendering. Presentation must not query persistence or implement authoritative routing policy.
-- **DR-2:** Server HTTP adapters call application modules; application modules call domain policy and owner-defined data interfaces. Domain rules must not depend on React Native, HTTP framework APIs, SQL, or mapping/weather vendor SDKs.
-- **DR-3:** Routing may read the campus map through the map module's interface. The map module must not depend on routing. The suggestion module owns submission handling and must not write canonical map records or depend on routing.
-- **DR-4:** Only the campus map module owns canonical map writes; only the suggestion module owns suggestion writes. Each accesses storage through its own interface. Persistence adapters implement those interfaces and cannot call application workflows or read another owner's tables on their behalf.
-- **DR-5:** Platform, database, and eventual external-service adapters implement interfaces defined by their consuming modules. Vendor data is translated at these boundaries; business policy stays in the domain. Assembly may wire adapters to interfaces without introducing reverse module dependencies.
-- **DR-6:** Requests flow from presentation through application logic to domain/data interfaces; results return along that call chain. Return values do not create reverse dependencies. No module dependency cycle or shared mutable store bypassing a data owner is permitted.
+## Data Flows and Trust Boundaries
 
-## Open Questions
-
-- **AQ-1 — Input reconciliation and versions:** iOS and Android are confirmed developer choices but absent from REQUIREMENTS.md and unresolved in DESIGN.md. Source alignment is **TO BE DECIDED**. Does the supplied server-framework value mean built-in Node.js HTTP facilities or an additional framework? Node.js and React Native versions are **UNKNOWN**; version selection is **TO BE DECIDED**.
-- **AQ-2 — Environment and capacity:** Deployment environment, map size, concurrent requests/writes, latency, and availability expectations are **UNKNOWN**. Database/driver selection and suitability of request-time graph computation are **TO BE DECIDED** against those facts.
-- **AQ-3 — Authoritative map data:** Source, format, coordinate/level conventions, permitted use, completeness, freshness, and update authority are **UNKNOWN**. Data acquisition, validation, and update mechanisms are **TO BE DECIDED**; suggestion submission does not define them.
-- **AQ-4 — Routing policy:** Distance/cost metric, rain-versus-mobility precedence, safer-path meaning, additional mobility needs, and unavailable-route behavior are **TO BE DECIDED** (OQ-1, OQ-3, OQ-5). These determine graph attributes, solver selection, and result contracts.
-- **AQ-5 — Weather, location, and connectivity:** Weather source and triggers beyond rain, positioning scope/provider, and connectivity expectations are **UNKNOWN** (OQ-2). Integration mechanisms are **TO BE DECIDED**; manual room entry remains independent of GPS (FR-2.1).
-- **AQ-6 — Identifier and route contracts:** Unknown/ambiguous room handling and cross-building level notation are **TO BE DECIDED** (OQ-4, OQ-9; DQ-3). Canonical identifiers and the response representation must support those decisions.
-- **AQ-7 — Suggestion lifecycle:** Required payload, validation rules, attribution, post-submission behavior, and responsibility for subsequent map changes are **TO BE DECIDED** (OQ-8; DQ-6). No moderation or publishing component is established by FR-6.1.
-- **AQ-8 — Native presentation and accessibility:** Minimum OS/device support and languages are **UNKNOWN**. Native token conversion, route/map renderer, level notation, visual aids, mobility controls, and control/focus dimensions are **TO BE DECIDED** (DQ-2, DQ-3, DQ-4, DQ-5). Reconcile DESIGN.md's WCAG 2.2 AA contrast wording with the unresolved overall conformance target (OQ-6); proposed brand adoption remains DQ-1.
-- **AQ-9 — Identity and security:** Authentication, action permissions, session needs, privacy/regulatory obligations, and retention of locations, mobility choices, or suggestions are **UNKNOWN** (OQ-10). Policy and enforcement details are **TO BE DECIDED** in `SECURITY.md`; version-specific packs require confirmed versions.
-- **AQ-10 — Undefined action:** The meaning of "mark the app" is **UNKNOWN** (OQ-7). Any architectural consequence is **TO BE DECIDED** after behavior is defined.
-
-## Diagrams
-
-The **PROPOSED** component diagram shows logical authority and data-access boundaries, not deployment topology. Arrows show request/access direction; responses return along the same path. Unselected weather and positioning integrations are omitted.
+The device is outside server authority. The edge terminates the public transport boundary; application modules own semantic processing; PostgreSQL and operations interfaces are private infrastructure. Each boundary's enforcement is specified in SECURITY.md.
 
 ```mermaid
 flowchart LR
-    subgraph device["Student-controlled device: iOS or Android"]
-        UI["React Native presentation"]
-        State["Client state and API adapter"]
-        UI --> State
-    end
-    subgraph server["Server authority: Node.js"]
-        API["HTTP API adapter"]
-        Routing["Routing module"]
-        Map["Campus map module"]
-        Suggestions["Suggestion module"]
-        Persistence["Owner-specific persistence adapters"]
-        API --> Routing
-        API --> Suggestions
-        Routing -->|read graph and resolve identifiers| Map
-        Map --> Persistence
-        Suggestions --> Persistence
-    end
-    subgraph data["Private persistence boundary"]
-        Store[("Map and suggestion records: SQLite PROPOSED")]
-    end
-    State -->|HTTPS JSON: trust boundary| API
-    Persistence --> Store
+    UI[Native presentation] --> State[Client state and adapters]
+    State --> Edge[Nginx edge]
+    Edge --> API[Fastify adapter]
+    API --> Identity[Identity module]
+    API --> Routing[Routing module]
+    API --> Reports[Report module]
+    API --> Review[Review coordinator]
+    Review --> Reports
+    Review --> Map[Map module]
+    Routing --> Map
+    Routing --> Workers[Graph workers]
+    Map --> DB[(PostgreSQL via owner adapters)]
+    Reports --> DB
+    Identity --> DB
+    Identity --> SES[SES email boundary]
 ```
 
-The **PROPOSED** route flow highlights server-owned resolution and policy; error semantics remain open.
+1. Route inputs cross the device/edge boundary into AQ-6. The routing module resolves IDs through the map module, pins a graph version, submits a worker job and returns the outcome through the same interfaces.
+2. Report inputs cross AQ-7 into the report transaction. A later moderator operation crosses the management boundary and invokes the review coordinator; publication changes the map manifest and worker revision.
+3. Native positioning stays inside the client adapter until the confirmed map-node ID enters the route request. Weather is local request context, not an external observation.
+4. Identity challenges cross the email boundary; session DTOs return to the credential adapter. Account, export and deletion jobs pass through the identity/report owners.
 
-```mermaid
-sequenceDiagram
-    participant App as Mobile client
-    participant API as API adapter
-    participant Routing as Routing module
-    participant Map as Campus map module
-    App->>API: Typed starting room, destination, applicable context
-    API->>Routing: Structurally validated request
-    Routing->>Map: Resolve identifiers and read graph
-    Map-->>Routing: Map data with explicit building and level endpoints
-    Note over Routing: Apply agreed routing policy, independent of GPS for a typed origin
-    Routing-->>API: Route outcome (failure contract TO BE DECIDED)
-    API-->>App: Result for client state and presentation
-```
+## Verification Dependencies
+
+Implementation must demonstrate native builds, driver/transaction behavior, schema integration, transport controls and the REQUIREMENTS.md acceptance suite. No runtime compatibility test is claimed by this documentation change. The outstanding threat-model work is tracked only by [OD-015](SECURITY.md#od-015); it does not block these architecture decisions.

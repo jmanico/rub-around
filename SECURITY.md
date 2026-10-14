@@ -1,231 +1,233 @@
 # Security
 
+This file is the sole author of security controls and trust-boundary enforcement. Externally observable permissions and failures remain in [REQUIREMENTS.md](REQUIREMENTS.md); interface topology in [ARCHITECTURE.md](ARCHITECTURE.md); user-facing interaction and rendering conventions in [DESIGN.md](DESIGN.md). An ACTIVE rule is a complete implementation obligation, not a statement that the unimplemented application passed a security test.
+
 ## Secure-Coding Inputs
 
-- **Read:** [REQUIREMENTS.md](REQUIREMENTS.md), including Required Requirement Inputs, FR-1.1–FR-6.1, and OQ-1–OQ-10. Confirmed workflows include campus routing, a typed-room origin independent of GPS, indoor and elevator routes, and student map change suggestions. Authentication, roles, and privacy/regulatory obligations are **UNKNOWN**. Student identification is not an established data entity.
-- **Read:** [DESIGN.md](DESIGN.md), including Components, Do's and Don'ts, and DQ-2–DQ-6. Route inputs, results, and suggestions have presentation patterns; device support, route representation, and suggestion fields/states remain unresolved. Browser behavior and rendering technology are **UNKNOWN**.
-- **Read:** [ARCHITECTURE.md](ARCHITECTURE.md), including Required Architecture Inputs, Architecture and Decisions, Components and Flows, Dependency Rules, and AQ-1–AQ-10. Node.js and React Native for iOS/Android are confirmed technology choices; their versions are **UNKNOWN**. All component boundaries are explicitly **PROPOSED**. Built-in HTTP handling, HTTPS JSON, SQLite, module ownership, persistence interfaces, and request-scoped location/context handling are proposals, not confirmed enforcement mechanisms.
-- **Missing:** Existing repository-root `SECURITY.md`; no prior `SC-###` or `OD-###` IDs were available to preserve.
-- **Read:** The supplied security notes propose anonymous map-only access, valid student identification before a map-change submission, and GDPR applicability from identification combined with geolocation. These notes do not establish requirements. Their relationship to unresolved authentication, suggestion behavior, data collection, and legal obligations is **TO BE DECIDED** ([OD-009](#od-009), [OD-010](#od-010), [OD-012](#od-012)).
-- **Material source mismatches:** ARCHITECTURE.md AQ-1 confirms iOS/Android while REQUIREMENTS.md does not establish target surfaces and DESIGN.md DQ-2 leaves them unknown. DESIGN.md Colors names WCAG 2.2 AA contrast thresholds while REQUIREMENTS.md OQ-6 leaves version and overall conformance unresolved; ARCHITECTURE.md AQ-8 records this mismatch. Resolution remains **TO BE DECIDED** ([OD-002](#od-002), [OD-013](#od-013)).
+| Input | Owner reference |
+| --- | --- |
+| Actors, permitted actions and failures | FR-6.1–FR-7.11, FR-8.6 |
+| Privacy outcomes | NFR-6, NFR-7, FR-7.8, FR-7.9 |
+| Client presentation and sinks | DQ-3, DQ-4, DQ-6 |
+| Receiving interfaces and trust boundaries | AQ-6, AQ-7, AQ-11 |
+| Versions and deployment | AQ-1, AQ-2, AQ-8, AQ-9 |
+| External-data contracts | AQ-3, AQ-5 |
 
-REQUIREMENTS.md owns behavior, users, data, integrations, and compliance; DESIGN.md owns interaction, rendering, and browser behavior; ARCHITECTURE.md owns components, interfaces, flows, and trust boundaries. Missing facts and proposed choices do not establish rule or pack applicability.
+The earlier anonymous-map-only and student-ID security notes were unadopted proposals. Product authority is OQ-10, including the user's explicit answer; no independent eligibility policy survives here. The old statement that no SECURITY.md existed described an earlier authoring step and is removed as stale metadata.
 
-## Selected Manicode Prompts
+## Security Guidance Composition
 
-Corpus root used for resolution: `/Users/jmanico/Dropbox/github/aegis/secure-coding-knowledge`. All corpus paths below are relative to this absolute root. Candidate manifests, prompt scope statements, source scope records, `README.md`, `content/README.md`, and `content/preamble.md` were read. Resolution used `scripts/resolve_prompt.py --json` for each candidate and for a diagnostic combined composition.
+Corpus provenance: `/Users/jmanico/Dropbox/github/aegis/secure-coding-knowledge`, revision `3ac1af76f06e0c89b43afca121d63279a730806f`. Each pack has `content/<pack>/manifest.json`, `prompt.md` and `sources.md`. `content/preamble.md` precedes the following dependency-first order once. The rules below are self-contained; another checkout need not have that local corpus to understand its obligations.
 
-**Direct selection evidence**
+| Order | Pack | Selection and scope |
+| --- | --- | --- |
+| 1 | `js/javascript/ES2026` | SELECTED transitive coding baseline; use only APIs supported by the actual host. No claim of full ES2026 engine coverage. |
+| 2 | `js/nodejs/24` | SELECTED direct server runtime guidance. |
+| 3 | `js/react/19` | SELECTED transitive native state/text guidance; DOM, SSR and Server Functions are inapplicable. |
+| 4 | `js/typescript/6.0` | SELECTED direct compiler guidance matching AQ-1. |
+| 5 | `js/react-native/0.87` | SELECTED direct client boundary guidance. |
+| 6 | `js/fastify/5.12` | SELECTED direct server lifecycle guidance. |
+| 7 | `js/zod/4` | SELECTED direct validation guidance. |
 
-- **`js/nodejs/26` — BLOCKED; selection TO BE DECIDED.** ARCHITECTURE.md Required Architecture Inputs and AQ-1 confirm Node.js but no release line. [OD-001](#od-001).
-  Prompt: `content/js/nodejs/26/prompt.md`; source: `content/js/nodejs/26/sources.md`.
-- **`js/react-native/0.87` — BLOCKED; selection TO BE DECIDED.** ARCHITECTURE.md Required Architecture Inputs and AQ-1 confirm React Native but no version. Device/presentation alignment remains AQ-8 and DESIGN.md DQ-2. [OD-002](#od-002).
-  Prompt: `content/js/react-native/0.87/prompt.md`; source: `content/js/react-native/0.87/sources.md`.
-- **`js/fastify/5.12` — BLOCKED; selection TO BE DECIDED.** ARCHITECTURE.md Frameworks and API and AQ-1 leave the HTTP framework open and only propose built-in Node.js HTTP handling. Fastify and its version are **UNKNOWN**. [OD-003](#od-003).
-  Prompt: `content/js/fastify/5.12/prompt.md`; source: `content/js/fastify/5.12/sources.md`.
-- **`jvm/android-sdk/37` — BLOCKED; selection TO BE DECIDED.** Android is confirmed in ARCHITECTURE.md Required Architecture Inputs, but SDK, compile/target/runtime scope, supported OS versions, and passkey use are **UNKNOWN** (AQ-1, AQ-8, AQ-9). This pack's Android 17/API 37 scope is not established by naming Android. [OD-004](#od-004).
-  Prompt: `content/jvm/android-sdk/37/prompt.md`; source: `content/jvm/android-sdk/37/sources.md`.
-- **`swift/ios-sdk/27` — BLOCKED; selection TO BE DECIDED.** iOS is confirmed in ARCHITECTURE.md Required Architecture Inputs, but SDK, toolchain, deployment targets, and passkey use are **UNKNOWN** (AQ-1, AQ-8, AQ-9). This pack's Xcode 27/iOS SDK 27 scope is unconfirmed. [OD-004](#od-004).
-  Prompt: `content/swift/ios-sdk/27/prompt.md`; source: `content/swift/ios-sdk/27/sources.md`.
-- **`js/zod/4` — BLOCKED; selection TO BE DECIDED.** ARCHITECTURE.md proposes parsing/validation responsibilities, but establishes no validation library or version; request and suggestion contracts remain AQ-6/AQ-7. [OD-005](#od-005).
-  Prompt: `content/js/zod/4/prompt.md`; source: `content/js/zod/4/sources.md`.
-- **`js/prisma/7.10` — BLOCKED; selection TO BE DECIDED.** ARCHITECTURE.md Persistence and Routing Model and AQ-2 leave database/driver selection open. Proposed SQLite storage does not confirm Prisma or its version. [OD-006](#od-006).
-  Prompt: `content/js/prisma/7.10/prompt.md`; source: `content/js/prisma/7.10/sources.md`.
-- **`infra/dockerfile/1` — BLOCKED; selection TO BE DECIDED.** ARCHITECTURE.md Required Architecture Inputs and AQ-2 leave deployment unknown. Dockerfile syntax 1, BuildKit, and Linux container use are not confirmed. [OD-007](#od-007).
-  Prompt: `content/infra/dockerfile/1/prompt.md`; source: `content/infra/dockerfile/1/sources.md`.
+The resolver was run with Node.js, React Native, Fastify, TypeScript and Zod as direct targets. It substitutes the chosen TypeScript pack for the 7.x parent declared by React Native, Fastify and Zod. This is an explicit project scope decision, supported by the native template in AQ-1 and [Zod's compiler requirements](https://zod.dev/); resolver precedence alone proves no compatibility. The application must pass type checks and native/integration builds before release.
 
-**Selected ordered composition:** Empty. No direct or transitive pack is **SELECTED**.
-
-**Preamble, separately:** `content/preamble.md` resolves before packs, once per composition. It has no manifest or separate source file. It supplies application guidance, not missing project facts or an independently eligible implementation rule. No pack composition is activated here.
-
-**Evaluated dependency-first orders:** These are candidate-resolution results, not selected compositions. `D` marks a directly requested candidate and `T` a transitive pack. Shared parents are deduplicated by the resolver.
-
-1. Node.js: `js/javascript/ES2026` (T) → `js/nodejs/26` (D).
-2. React Native: `js/javascript/ES2026` (T) → `js/react/19` (T) → `js/typescript/7` (T) → `js/react-native/0.87` (D).
-3. Fastify: `js/javascript/ES2026` (T) → `js/nodejs/24` (T) → `js/typescript/7` (T) → `js/fastify/5.12` (D).
-4. Android SDK: `jvm/kotlin/2.4` (T) → `jvm/android-sdk/37` (D).
-5. iOS SDK: `swift/swift/6.4` (T) → `swift/ios-sdk/27` (D).
-6. Zod: `js/javascript/ES2026` (T) → `js/typescript/7` (T) → `js/zod/4` (D).
-7. Prisma: `js/javascript/ES2026` (T) → `js/nodejs/24` (T) → `js/typescript/7` (T) → `js/prisma/7.10` (D).
-8. Dockerfile: `infra/dockerfile/1` (D); no parent packs.
-
-**Transitive eligibility and provenance:** All six parents are **BLOCKED**, pending [OD-008](#od-008) and their direct candidates' decisions. Each listed pack's `manifest.json`, beside its prompt/source files, establishes its declared includes. These includes do not establish the project's dependencies.
-
-- **`js/javascript/ES2026`:** Language edition and host/API coverage are **UNKNOWN**. Browser/DOM guidance does not become applicable merely through Node.js or React Native.
-  Prompt: `content/js/javascript/ES2026/prompt.md`; source: `content/js/javascript/ES2026/sources.md`.
-- **`js/nodejs/24`:** Included by Fastify and Prisma, but the project has no confirmed Node.js release line. Neither 24 nor the direct candidate 26 is selected.
-  Prompt: `content/js/nodejs/24/prompt.md`; source: `content/js/nodejs/24/sources.md`.
-- **`js/react/19`:** Included by React Native; React version and applicable rendering host are **UNKNOWN**. DOM, server rendering, and server-function applicability are unconfirmed.
-  Prompt: `content/js/react/19/prompt.md`; source: `content/js/react/19/sources.md`.
-- **`js/typescript/7`:** Included by React Native, Fastify, Zod, and Prisma; project TypeScript use/version and toolchain compatibility are **UNKNOWN**. This prompt specifically scopes its guidance to 7.0.x.
-  Prompt: `content/js/typescript/7/prompt.md`; source: `content/js/typescript/7/sources.md`.
-- **`jvm/kotlin/2.4`:** Included by Android SDK; project Kotlin use/version and native-module scope are **UNKNOWN**.
-  Prompt: `content/jvm/kotlin/2.4/prompt.md`; source: `content/jvm/kotlin/2.4/sources.md`.
-- **`swift/swift/6.4`:** Included by iOS SDK; project Swift use/version and native-module scope are **UNKNOWN**.
-  Prompt: `content/swift/swift/6.4/prompt.md`; source: `content/swift/swift/6.4/sources.md`.
-
-**Unresolved composition differences:** In the combined diagnostic, direct `js/nodejs/26` mechanically replaces the `js/nodejs/24` parents declared by Fastify and Prisma. That resolver precedence establishes neither project selection nor compatibility; the difference remains [OD-008](#od-008). The React Native source record also explicitly leaves TypeScript 7 integration and complete ES2026 host support unproven. No runtime substitution or compatibility conclusion is adopted.
+Former candidates `js/nodejs/26`, `js/typescript/7`, `js/prisma/7.10` and `infra/dockerfile/1` are NOT SELECTED because their technologies are not adopted. `jvm/android-sdk/37` and `swift/ios-sdk/27` passkey-oriented candidates, and their `jvm/kotlin/2.4` and `swift/swift/6.4` parents, are NOT SELECTED: their scope differs from AQ-8/AQ-9. No version substitution is silently treated as compatible. Native storage/permission controls below derive from the selected React Native guidance and platform APIs, not an ineligible passkey pack. Database query controls also use the [node-postgres query documentation](https://node-postgres.com/features/queries).
 
 ## Secure-Coding Rules
 
-No rule is **ACTIVE**: eligible version-scoped guidance and confirmed enforcement points are unavailable. The preamble does not fill those gaps. These stable IDs reserve blocked coverage; the entries are not implementation instructions.
+### SC-001
 
-**SC-001 — Server request handling**
+**ACTIVE — server request handling.** Owner: backend maintainer. Dependencies: OD-001, OD-003, OD-008, OD-011, OD-012 (all resolved).
 
-- **Status:** BLOCKED
-- **Dependency:** Runtime/framework selection, confirmed receiving components, request contracts, and resource budgets remain unresolved ([OD-001](#od-001), [OD-003](#od-003), [OD-008](#od-008), [OD-011](#od-011), [OD-012](#od-012)). ARCHITECTURE.md Frameworks and API and AQ-1/AQ-2 do not establish parsing APIs, transport configuration, or limits.
+Terminate TLS at the AQ-2 edge with TLS 1.2 or newer; restrict the backend listener to loopback. Trust forwarding metadata only from the loopback edge and overwrite incoming forwarding headers there. Keep strict HTTP parsing and reject malformed targets, conflicting framing, duplicate authorization headers, more than 100 headers or 16 KiB total headers. Expose no debug, stack or environment data through errors/health responses. Use request IDs generated by the server, never accepted as identity.
 
-**SC-002 — Mobile data and local state**
+Set 16 KiB JSON body limits, reject compressed request bodies and unsupported media types, and enforce a maximum parsed depth of 8. Set header/read/connection deadlines to 10 seconds, keep-alive to 5 seconds and an application deadline of 5 seconds with cancellation; no public handler may override these to unlimited. Cap each graph job at 2 seconds, its queue at 100, and return overload before enqueueing beyond the cap. Rate-limit route computation to 30/minute per canonical source IP or IPv6 /64 with a burst of 10; bound all public API traffic to 300/minute with burst 50. Use the most restrictive applicable bucket. The initial single-instance limiter may be memory-local; adding replicas requires a shared limiter before deployment.
 
-- **Status:** BLOCKED
-- **Dependency:** React Native version, native platform scope, approved client boundaries, retained data, and rendering behavior are unresolved ([OD-002](#od-002), [OD-008](#od-008), [OD-010](#od-010), [OD-011](#od-011), [OD-013](#od-013)). ARCHITECTURE.md AQ-8/AQ-9 and DESIGN.md DQ-2/DQ-3 do not establish storage or permission mechanisms.
+Validate incoming and outgoing DTOs at their receiving boundary. Return allowlisted response fields through the normal Fastify lifecycle; prohibit unreviewed raw replies, hijacking or dynamic schemas. Security hook initialization must finish before listening. Rate-limit storage failure must fail closed for protected actions. Verification: AC-11 plus real edge/socket tests for oversized headers, ambiguous framing, forged proxy headers, slow senders, cancellation and queue overload.
 
-**SC-003 — Native passkeys**
+### SC-002
 
-- **Status:** BLOCKED
-- **Dependency:** Passkey adoption, identity policy, SDK/toolchain versions, platform applicability, and client/server authentication interfaces are unconfirmed ([OD-004](#od-004), [OD-008](#od-008), [OD-009](#od-009), [OD-011](#od-011)). REQUIREMENTS.md OQ-10 and ARCHITECTURE.md AQ-9 do not establish passkeys; a student-ID note does not select them.
+**ACTIVE — mobile data and permissions.** Owner: mobile maintainer. Dependencies: OD-002, OD-008, OD-010, OD-011, OD-013 (resolved).
 
-**SC-004 — Route and suggestion validation**
+Treat client state and native-module results as untrusted; validate them at module and API boundaries. Keep access credentials in memory only and refresh credentials in iOS Keychain (`WhenUnlockedThisDeviceOnly`) or authenticated ciphertext protected by Android Keystore. Exclude credentials and private drafts from backup and diagnostics. Obscure sensitive screens in app-switcher snapshots and use platform screen-capture protection where available; device owners can still capture visible content. Do not persist report drafts or route context. Clear private state on logout, account change, revocation and process termination; public map cache may remain until replaced or explicitly cleared.
 
-- **Status:** BLOCKED
-- **Dependency:** Validation technology, confirmed receiving boundaries, accepted fields, identifier semantics, rejection behavior, and bounds are unresolved ([OD-001](#od-001), [OD-003](#od-003), [OD-005](#od-005), [OD-008](#od-008), [OD-011](#od-011), [OD-012](#od-012)). See REQUIREMENTS.md OQ-8/OQ-9, DESIGN.md DQ-6, and ARCHITECTURE.md AQ-6/AQ-7.
+Keep ATS and Android cleartext rejection enabled. Use normal platform certificate/hostname validation without a custom pinning scheme. Request foreground location only at the interaction defined by DQ-6; no background location, advertising identifiers, contacts, camera or microphone permission. Native adapters expose only credential operations and one-shot foreground positioning, with bounded argument/result validation. Release builds contain no development menu, packager access, debugging listener or bundled secret. Verification: AC-03/AC-10 and backup extraction, denied permission, stale-state and release-binary inspection.
 
-**SC-005 — Data-access safety**
+### SC-003
 
-- **Status:** BLOCKED
-- **Dependency:** Database/driver/ORM selection, eligible composition, confirmed persistence interfaces, data fields, and retention are unresolved ([OD-001](#od-001), [OD-006](#od-006), [OD-008](#od-008), [OD-010](#od-010), [OD-011](#od-011), [OD-012](#od-012)). ARCHITECTURE.md Persistence and Routing Model and DR-3/DR-4 remain proposed; query APIs and transaction mechanisms are unconfirmed.
+**NOT APPLICABLE — native passkeys.** Owner: mobile maintainer. OD-004 and AQ-9 exclude passkeys. This ID remains reserved for its original purpose; it is not relabeled as a different control. If passkeys enter scope, reopen OD-004 before implementation. Authentication is covered by SC-012.
 
-**SC-006 — Container build and runtime controls**
+### SC-004
 
-- **Status:** BLOCKED
-- **Dependency:** Container adoption, platform, builder/runtime scope, and deployment enforcement points are unknown ([OD-007](#od-007), [OD-011](#od-011)). ARCHITECTURE.md AQ-2 supplies no container configuration or build/runtime authority.
+**ACTIVE — validation.** Owner: backend maintainer. Dependencies: OD-001, OD-003, OD-005, OD-008, OD-011, OD-012 (resolved).
 
-**SC-007 — Anonymous access and student eligibility**
+Use `z.strictObject` at each AQ-6/AQ-7 input and explicit schemas for outputs. Reject extra fields, invalid discriminators, type coercion, nonfinite coordinates, points outside the selected floor geometry and invalid IDs. Accept only the parsed output. Apply product field limits from FR-6.2–FR-6.5; additionally cap room queries at 100 characters, email at 254, review reasons at 1,000, result lists at 50 entries per page and route output at 2,000 segments/1 MiB. Reject control characters except ordinary whitespace in descriptions. Markup rejection for FR-6.5 is a product check; inert rendering must still satisfy SC-011.
 
-- **Status:** BLOCKED
-- **Dependency:** The meaning of anonymous map-only access, permitted operations, student eligibility, validity evidence, and enforcement boundaries are unresolved ([OD-001](#od-001), [OD-003](#od-003), [OD-008](#od-008), [OD-009](#od-009), [OD-011](#od-011)). REQUIREMENTS.md FR-6.1/OQ-10 and ARCHITECTURE.md Authentication and Session Boundary do not authorize adopting the security notes as an access policy.
+Configure a synchronous Fastify validator adapter returning `{value}` or `{error}`; no async schema effects, coercion, fallback authorization values or dynamically compiled client schemas. Keep database checks in the service transaction after structural validation. Reject prototype-pollution keys and duplicate JSON object keys using a bounded token scan before the protected JSON parser; do not rely on JSON.parse's last-value behavior. Validate records loaded from storage and map bundles before domain use. Verification: AC-03/AC-06/AC-11, fuzzed variants, nested input, duplicate keys, prototype keys and output field-leak tests.
 
-**SC-008 — Identification and location privacy**
+### SC-005
 
-- **Status:** BLOCKED
-- **Dependency:** Student-identification collection, location handling/linkage, applicable legal obligations, permitted uses, storage/disclosure/retention policy, and enforcement points are unknown ([OD-010](#od-010), [OD-011](#od-011), [OD-014](#od-014)). REQUIREMENTS.md Required Requirement Inputs and ARCHITECTURE.md AQ-5/AQ-9 do not establish the notes' GDPR assertion or a retention period.
+**ACTIVE — data access.** Owner: backend maintainer. Dependencies: OD-001, OD-006, OD-008, OD-010, OD-011, OD-012 (resolved).
 
-**SC-009 — Suggestion and canonical-map integrity**
+Use `pg` parameter binding for values; select identifiers/orderings from application-owned constants. Never concatenate input into SQL. Run the API under a non-owner database role without schema-change privileges; migrations use a separate short-lived role. Scope every report query by the authenticated owner or explicitly verified moderator operation. Enforce foreign keys, uniqueness and version constraints in the database as well as domain validation.
 
-- **Status:** BLOCKED
-- **Dependency:** Approved data ownership, submission semantics, canonical-map update authority, persistence mechanism, and validation contracts are unresolved ([OD-001](#od-001), [OD-006](#od-006), [OD-008](#od-008), [OD-009](#od-009), [OD-011](#od-011), [OD-012](#od-012)). REQUIREMENTS.md FR-6.1 defines suggestions; ARCHITECTURE.md's separate suggestion storage and DR-3/DR-4 are proposed, and AQ-7 establishes no moderation/publishing component.
+Use one checked-out client for each transaction and release it in `finally`; rollback on failure. Set pool size 10, acquisition timeout 2 seconds, statement timeout 3 seconds and idle-in-transaction timeout 5 seconds. Keep the database on private networking with verified TLS. Encrypt database and backup storage using managed keys. Verification: AC-07/AC-08/AC-10 and query-injection, cross-account lookup, rollback and connection-exhaustion tests.
 
-**SC-010 — Map, weather, and positioning inputs**
+### SC-006
 
-- **Status:** BLOCKED
-- **Dependency:** Sources/providers, data contracts, external interfaces, accepted destinations, trust policy, and failure behavior are unresolved ([OD-001](#od-001), [OD-003](#od-003), [OD-008](#od-008), [OD-011](#od-011), [OD-014](#od-014)). REQUIREMENTS.md FR-2.1/FR-4.1 and ARCHITECTURE.md AQ-3/AQ-5 establish workflows, not integration mechanisms.
+**NOT APPLICABLE — container controls.** Owner: operations maintainer. OD-007 selects a host deployment without containers. This ID remains available only for its original scope. Host deployment is controlled by SC-013; introducing containers requires reopening OD-007.
 
-**SC-011 — Rendering and browser behavior**
+### SC-007
 
-- **Status:** BLOCKED
-- **Dependency:** React Native and inherited pack applicability, approved presentation boundaries, map/route rendering, content formats, and any browser or embedded-web scope are unresolved ([OD-002](#od-002), [OD-008](#od-008), [OD-011](#od-011), [OD-013](#od-013)). DESIGN.md Components/DQ-2/DQ-3/DQ-6 and ARCHITECTURE.md AQ-8 do not establish HTML sinks, WebViews, or browser-origin policies.
+**ACTIVE — authorization.** Owner: backend maintainer. Dependencies: OD-001, OD-003, OD-008, OD-009, OD-011 (resolved).
 
-**SC-012 — Authentication and session lifecycle**
+Enforce the FR-7.1–FR-7.11 role/action matrix in API hooks and again at owning service operations. Authenticate protected routes before allocating their bodies where possible. Never trust a client-supplied owner, role, approval state or eligibility flag. Resolve identity per request and check current suspension/role state; no mutable global “current user.” Restrict moderator endpoints to the management network and operator-issued moderator sessions. Revoke role-bearing sessions when privileges change. Query-level ownership is SC-005.
 
-- **Status:** BLOCKED
-- **Dependency:** Whether authentication/sessions exist, credential/provider choices, native authentication scope, lifecycle rules, sensitive-data handling, and enforcement points are unresolved ([OD-001](#od-001), [OD-002](#od-002), [OD-003](#od-003), [OD-004](#od-004), [OD-008](#od-008), [OD-009](#od-009), [OD-010](#od-010), [OD-011](#od-011)). REQUIREMENTS.md OQ-10 and ARCHITECTURE.md AQ-9 do not establish passwords, tokens, cookies, or session mechanisms.
+Require fresh operator authentication for role changes and a second operator review for granting moderation rights when multiple maintainers exist; for a sole maintainer, record the grant in the immutable administrative audit trail. Apply the eligibility policy in FR-7.3 without adding a second identity requirement. Verification: AC-09 and direct calls bypassing UI, sibling Fastify plugin scopes, encoded paths, stale roles and cross-owner resources.
 
-## Open Security Decisions
+### SC-008
+
+**ACTIVE — privacy and retention.** Owner: repository maintainer acting as privacy/operations owner. Dependencies: OD-010, OD-011, OD-014 (resolved).
+
+Collect only email, random account ID, role, challenge/session verifiers and the report fields owned by requirements. Do not attach route requests, native coordinates or mobility selections to an account or analytics identifier. Routes and draft context exist only for the current request/app session. Do not log bodies, authorization headers, codes, email addresses or raw source IPs. Edge access logs use endpoint names, status, latency and random correlation IDs; disable raw query/path logging. Rate-limit addresses exist only in memory for bucket lifetime, at most one hour. No advertising or third-party product analytics SDK is permitted.
+
+Delete expired challenge material within one hour. Delete expired/revoked session verifiers within 24 hours. Run account-deletion jobs according to FR-7.8 and FR-7.10. Retain identifiable reports through review and for 90 days after closure, with an absolute 180-day cap from submission; then erase attribution and free text, retaining only nonpersonal accepted map facts. Keep sanitized operational logs 14 days and privileged-action audit records 180 days. Export artifacts expire after seven days. Backup retention is controlled by SC-013; apply deletion tombstones before a restored system serves requests. Explicit account deletion under FR-7.8 takes precedence over report retention: remove attributable audit/report data or its identity mapping within that deadline. Data sent to mail infrastructure contains only the recipient and the authentication or account-lifecycle notice content; no location, report or mobility data.
+
+Use the release evidence and processing basis in OD-010. Verification: AC-10 with controlled time, storage/log scans, backup restore deletion replay and report anonymization. Do not treat geographic region selection alone as proof of legal compliance.
+
+### SC-009
+
+**ACTIVE — map and report integrity.** Owner: backend/map maintainer. Dependencies: OD-001, OD-006, OD-008, OD-009, OD-011, OD-012 (resolved).
+
+Enforce map ownership from DR-3/DR-4 at service and database boundaries. Bind idempotency receipts to principal, key and canonical payload hash with a unique constraint, retaining them for the product retry window. Commit receipt and report atomically. Review/publish transactions require current moderator authorization, expected versions and an audit event; commit all or none. A report cannot invoke the map writer directly. Enforce the independent-review condition in FR-7.11 by comparing the authenticated reviewer ID with the report owner before publication.
+
+Validate imported connectivity, nonnegative finite lengths, endpoint floor references, geometry bounds, provenance and survey evidence. A release cannot claim indoor or mobility coverage without actual evidence. Never promote a raw user report directly into verified route eligibility. Verify reopening before lifting a closure. Verification: AC-07/AC-08/AC-14 with stale revisions, concurrent reviews, failed commits, self-review and poisoned graph fixtures.
+
+### SC-010
+
+**ACTIVE — external and map inputs.** Owner: backend/map maintainer. Dependencies: OD-001, OD-003, OD-008, OD-011, OD-014 (resolved).
+
+Enforce the integration scope in AQ-3/AQ-5. Import only operator-supplied local files under a dedicated staging root; reject symlinks, traversal, executable content, unexpected files and unbounded archive expansion. Cap a complete uncompressed map bundle at 100 MiB and geometry counts at AQ-2 budgets. Record source, contributor permission, license, observation time and checksum for each import. Download public client bundles only from the configured API origin; cap each response at 10 MiB and verify schema, revision and manifest checksum before replacing the cached map.
+
+Keep outbound service hosts in deployment-controlled allowlists; user content never becomes a URL, path, executable or destination. Use the fixed regional SES endpoint with verified TLS, a five-second total deadline and at most two retries for transient failures. No request-controlled redirects or outbound fetches. Restrict egress to required AWS endpoints, database, DNS and time synchronization. Verification: AC-14 and traversal, malicious bundle, malformed native position, redirect and unexpected-destination tests.
+
+### SC-011
+
+**ACTIVE — rendering and outbound navigation.** Owner: mobile maintainer. Dependencies: OD-002, OD-008, OD-011, OD-013 (resolved).
+
+Render report text and labels only into inert native text components; never inject HTML, JavaScript, raw SVG/XML, event handlers or dynamic component names. Map geometry reaches an allowlisted native primitive adapter only after schema/size validation. Do not spread untrusted objects into component props. No embedded browser or script bridge is permitted in this release. Validate server responses and cached data again before rendering; reject unsafe or excessive geometry without replacing the last valid map.
+
+External links must come from a build-owned HTTPS allowlist and require the user action defined by DQ-6. No executable/custom schemes or user-supplied clickable report links. Do not restore deprecated private React Native imports or bypass Strict API checks to make a dependency work. Verification: AC-06/AC-13/AC-14 with markup, malicious URLs, oversized paths and invalid cached state; browser CSP/CSRF/RSC controls are not asserted for absent browser surfaces.
+
+### SC-012
+
+**ACTIVE — authentication and sessions.** Owner: backend/mobile maintainers. Dependencies: OD-001, OD-002, OD-003, OD-004, OD-008, OD-009, OD-010, OD-011 (resolved; passkeys excluded).
+
+Generate eight-digit email codes with `crypto.randomInt`; bind each to a random challenge ID and normalized email, expire after 10 minutes and permit at most five attempts. Store a keyed HMAC verifier, not the code or a guessable plain hash; compare equal-length verifiers with `timingSafeEqual`. Invalidate previous challenges on replacement and consume codes atomically. Limit sends to three/hour per email and 10/hour per source network; generic challenge responses must not disclose account existence. Persist attempt/account limits so restart cannot reset them. SES failure returns generic temporary failure and creates no session.
+
+Issue 256-bit random opaque access and refresh credentials; store SHA-256 verifiers server-side. Access expires in 15 minutes; refresh expires after seven days idle or 30 days absolute. Rotate refresh credentials atomically on every use, detect replay and revoke the token family; concurrent refresh attempts are serialized by the client. Enforce server-side revocation on every protected request. Refresh tokens live only in the SC-002 protected store. Require a new email challenge for deletion, export delivery and role changes if the last verification exceeds 10 minutes. Operator/moderator sessions also require management-network access and a hardware-MFA-protected operator login; ordinary email-only sessions cannot acquire management authority.
+
+Use bearer headers, no credentials in URLs and no browser cookie authentication. Never log codes, token material or secret configuration. When key loss or compromise occurs, revoke all affected challenges/sessions and require reauthentication. Verification: AC-09/AC-10 with expiry, brute force, challenge replay, concurrent refresh, token-family revocation and failed email delivery.
+
+### SC-013
+
+**ACTIVE — host deployment and operations.** Owner: operations maintainer. Dependencies: OD-007, OD-010, OD-011 (resolved).
+
+Run the API as a dedicated non-root systemd user with read-only application files, `NoNewPrivileges`, protected home/system directories, bounded temporary storage, 2 GiB process memory and restart limits. Start Node with its permission model and explicit read/worker grants; no shell/child-process/addon capability unless separately reviewed. Deny public database and SSH access; use AWS Systems Manager for administration with hardware MFA and least-privilege instance roles. Restrict secrets to runtime secret storage, not repository files, arguments or client bundles. Validate required config and fail startup on missing or malformed values.
+
+Take daily encrypted database backups with 30-day retention and test restore quarterly against NFR-4. Protect audit logs against application deletion. Apply security updates within seven days, or within 24 hours for actively exploited/high-critical exposure. Maintain an incident procedure: revoke exposed credentials, isolate affected hosts, preserve sanitized evidence, assess affected people/data and meet applicable notification duties. Verified legal/processor details are mandatory before public personal-data collection under OD-010. Verification: AC-12 plus network reachability, secret-access, least-privilege and restore checks.
+
+### SC-014
+
+**ACTIVE — dependency and build controls.** Owner: repository maintainer. Dependencies: OD-008, OD-011 (resolved).
+
+Use reviewed immutable lockfiles and approved install scripts. Audit direct and transitive packages, runtime and native toolchains; npm advisories alone do not cover Node, bundled Undici, plugins or platform libraries. Fail release for applicable unpatched high/critical findings. Follow patched releases within AQ-1 version lines; Fastify security updates may require a newer minor. Protect signing keys and inspect mobile artifacts for debug capability and secrets. Keep TypeScript strict checks, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `noImplicitOverride`, `noImplicitReturns` and `noUncheckedSideEffectImports`; prohibit security-boundary `any`/unchecked casts and disabled checks. Use native host scope rather than importing DOM/SSR controls into a native-only project. Verification evidence and command conventions are WQ-2/WQ-4 in AGENTS.md.
+
+## Resolved Security Decisions
+
+Each decision owner is the named role below, assigned to the repository maintainer until another maintainer accepts it. References carry the selected value; this table does not restate architecture or product decisions.
 
 ### OD-001
 
-- **Unresolved:** Node.js release line is **UNKNOWN**; selection is **TO BE DECIDED** (ARCHITECTURE.md Required Architecture Inputs; AQ-1).
-- **Evidence needed:** An authoritative architecture decision naming the server runtime version scope and execution environments before choosing runtime-specific guidance.
-- **Affected:** SC-001, SC-004, SC-005, SC-007, SC-009, SC-010, SC-012. Candidate: `js/nodejs/26`; transitive `js/nodejs/24` also awaits OD-008.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: backend maintainer.** Runtime is AQ-1; controls SC-001, SC-004, SC-005, SC-007, SC-009, SC-010, SC-012.
 
 ### OD-002
 
-- **Unresolved:** React Native version and supported client targets are **UNKNOWN**. Reconciliation of ARCHITECTURE.md's iOS/Android choices with REQUIREMENTS.md's source gap and DESIGN.md DQ-2 is **TO BE DECIDED** (AQ-1/AQ-8).
-- **Evidence needed:** Architecture version scope and supported platforms, with requirements/design alignment for the client surfaces.
-- **Affected:** SC-002, SC-011, SC-012. Candidate: `js/react-native/0.87`.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: mobile maintainer.** Client surfaces are OQ-11 and versions AQ-1/AQ-8; controls SC-002, SC-011, SC-012.
 
 ### OD-003
 
-- **Unresolved:** HTTP framework selection is **TO BE DECIDED**. ARCHITECTURE.md's supplied framework value is Node.js; built-in HTTP handling is only proposed. Fastify adoption/version are **UNKNOWN** (Frameworks and API; AQ-1).
-- **Evidence needed:** An architecture decision naming the HTTP implementation and version scope, receiving interfaces, transport ownership, and any intermediary/proxy boundary.
-- **Affected:** SC-001, SC-004, SC-007, SC-010, SC-012. Candidate: `js/fastify/5.12`.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: backend maintainer.** HTTP implementation and transport ownership are AQ-1/AQ-6/AQ-11; controls SC-001, SC-004, SC-007, SC-010, SC-012.
 
 ### OD-004
 
-- **Unresolved:** Passkey adoption, Android SDK scope, iOS SDK/toolchain scope, supported OS/deployment targets, and native integration mechanisms are **UNKNOWN**; selections are **TO BE DECIDED** (REQUIREMENTS.md OQ-10; ARCHITECTURE.md AQ-1/AQ-8/AQ-9).
-- **Evidence needed:** Requirements establishing authentication behavior and architecture confirming platform versions, native integration boundaries, and server verification interfaces. Platform targets alone do not establish passkeys.
-- **Affected:** SC-003, SC-012. Candidates: `jvm/android-sdk/37`, `swift/ios-sdk/27`; parents remain OD-008.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: mobile maintainer.** Native scope is AQ-8; credential approach AQ-9. SC-003 is not applicable and SC-012 supplies the applicable authentication control.
 
 ### OD-005
 
-- **Unresolved:** Validation library/version are **UNKNOWN**; selection is **TO BE DECIDED**. Proposed API validation does not select Zod (ARCHITECTURE.md Frameworks and API; AQ-6/AQ-7).
-- **Evidence needed:** Architecture-confirmed validation implementation and version scope; contract definitions and failure behavior from OD-012.
-- **Affected:** SC-004. Candidate: `js/zod/4`.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: backend maintainer.** Validation technology is AQ-1; interfaces AQ-6/AQ-7; control SC-004.
 
 ### OD-006
 
-- **Unresolved:** Database, driver, ORM use/version, and persistence interfaces are **TO BE DECIDED**; workload and environment are **UNKNOWN** (ARCHITECTURE.md Persistence and Routing Model; AQ-2). SQLite is proposed and does not establish Prisma use.
-- **Evidence needed:** Architecture-confirmed storage technology/version, access interfaces, ownership, and transaction/integrity requirements grounded in approved data contracts.
-- **Affected:** SC-005, SC-009. Candidate: `js/prisma/7.10`.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: backend maintainer.** Persistence technology and ownership are AQ-2/DR-4; controls SC-005 and SC-009.
 
 ### OD-007
 
-- **Unresolved:** Container use, deployment environment, builder/runtime, and platform are **UNKNOWN**; container selection is **TO BE DECIDED** (ARCHITECTURE.md Required Architecture Inputs; AQ-2).
-- **Evidence needed:** Architecture-confirmed deployment/build boundaries and, if adopted, Dockerfile syntax, BuildKit, and Linux-container applicability. No image, user, permission, or resource value is established.
-- **Affected:** SC-006. Candidate: `infra/dockerfile/1`.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: operations maintainer.** Deployment is AQ-2; SC-006 is not applicable and SC-013 applies.
 
 ### OD-008
 
-- **Unresolved:** Transitive technology/version applicability and compatibility are **UNKNOWN**; composition choices are **TO BE DECIDED**. Fastify/Prisma declare Node.js 24 while the direct runtime candidate names 26. The corpus resolver's substitution does not settle that difference. React Native's source record also does not establish TypeScript 7 integration or complete ES2026 host support.
-- **Evidence needed:** Authoritative architecture confirmation of actual language/compiler/runtime versions and host surfaces, plus verified version-specific compatibility evidence for every intended composition. Resolve the Node.js parent difference without treating dependency order as compatibility evidence. Establish each prompt's applicable native, browser, server, or toolchain scope before activating its rules.
-- **Affected:** All version-dependent rule coverage. Parents: `js/javascript/ES2026`, `js/nodejs/24`, `js/react/19`, `js/typescript/7`, `jvm/kotlin/2.4`, `swift/swift/6.4`.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: repository maintainer.** The guidance composition above explicitly resolves prior runtime/compiler parent mismatches. Actual toolchain choices remain AQ-1/AQ-8. Controls SC-001–SC-014 use their applicable host scopes; build verification is mandatory and has not yet occurred.
 
 ### OD-009
 
-- **Unresolved:** Authentication, anonymous permissions, student-ID validity/verification, and session needs are **UNKNOWN** in REQUIREMENTS.md Required Requirement Inputs/OQ-10 and ARCHITECTURE.md AQ-9. The notes prescribe anonymous map-only use and valid student identification for a map change; adopting or reconciling those statements is **TO BE DECIDED**. A suggestion and a canonical map edit are not established as the same operation.
-- **Evidence needed:** Requirements defining actors and permitted operations, the meaning and evidence of student eligibility, and submission versus editing behavior; architecture confirming identity authority and enforcement/lifecycle interfaces. Provider and credential choices remain unresolved.
-- **Affected:** SC-003, SC-007, SC-009, SC-012. Passkey candidates remain conditional on OD-004.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: product/backend maintainer.** Identity behavior and eligibility are OQ-10; identity interfaces AQ-9; controls SC-007, SC-009, SC-012.
 
 ### OD-010
 
-- **Unresolved:** Student-identification collection and linkage to location are **UNKNOWN**; applicable privacy/regulatory obligations and collection, use, disclosure, logging, and retention policies are **TO BE DECIDED**. The notes assert GDPR applicability, while REQUIREMENTS.md leaves privacy/regulatory constraints unknown and ARCHITECTURE.md AQ-9 leaves retention unresolved.
-- **Evidence needed:** Requirements defining actual personal-data processing, applicable obligations and their verified basis, permitted recipients/uses, and required lifecycle behavior; architecture defining the corresponding data flows, storage, diagnostics, and enforcement boundaries. No GDPR mechanism, legal basis, or retention value is selected here.
-- **Affected:** SC-002, SC-005, SC-008, SC-012; any identity/location-related control.
-- **Owner:** UNKNOWN.
+**RESOLVED — privacy posture. Owner: repository maintainer as project operator.** Treat the operator as controller for the service and document its verified legal identity/contact before launch; no university sponsorship or controller relationship is assumed. Apply GDPR and applicable German data-protection obligations. The selected processing basis is service-contract necessity for requested account/report services and documented legitimate interests for proportionate abuse/security records. Optional foreground location requires an informed, revocable choice; an OS permission by itself is not a complete legal basis. Avoid stored health/disability profiles and student IDs.
+
+The operator must document necessity, the security-interest balancing assessment, processor agreements, transfer arrangements, privacy notice, data-subject request procedure and DPIA screening before collecting production personal data. Deployment region does not eliminate international access/transfer questions. If the evidence cannot justify a processing activity, do not launch that activity. This is a chosen compliance process, not a legal opinion that an unseen organization already complies. The [European Commission's lawful-processing guidance](https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/legal-grounds-processing-data_en) supports assessing the basis against actual processing. Controls are SC-008/SC-013; user-visible outcomes are FR-7.8/FR-7.9/NFR-6/NFR-7.
 
 ### OD-011
 
-- **Unresolved:** Confirmed implementation/enforcement points are **UNKNOWN**. ARCHITECTURE.md Components and Flows explicitly labels every component boundary proposed; its transport, storage, dependency rules, and diagrams remain proposed. Adoption is **TO BE DECIDED**.
-- **Evidence needed:** Architecture decisions establishing components, interfaces, flows, ownership, and enforcement boundaries for the approved workflows, including transport and diagnostics where applicable. A SUPPORTED responsibility alone does not establish component or technology approval.
-- **Affected:** SC-001–SC-012; activation and observable verification of every implementation rule.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: architecture/backend maintainer.** AQ-11 and DR-1–DR-6 establish receiving components; SC-001–SC-014 define enforcement at applicable boundaries. Threat-model deferral does not invalidate these controls.
 
 ### OD-012
 
-- **Unresolved:** Route/suggestion schemas, identifier handling, routing outcomes, submission lifecycle, map-update authority, resource budgets, and persistence outcomes are **TO BE DECIDED** (REQUIREMENTS.md OQ-1/OQ-3/OQ-5/OQ-8/OQ-9; DESIGN.md DQ-3/DQ-6; ARCHITECTURE.md AQ-2/AQ-3/AQ-4/AQ-6/AQ-7).
-- **Evidence needed:** Requirements defining accepted data and observable success/failure behavior; design defining validation/submission states; architecture establishing contracts, map/suggestion write authority, bounds, and persistence semantics. The notes' phrase "submit a map change" needs reconciliation with FR-6.1's suggestion workflow.
-- **Affected:** SC-001, SC-004, SC-005, SC-009. No moderation or publishing mechanism is inferred.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: product/backend maintainer.** Product contracts are OQ-1/OQ-3/OQ-5/OQ-8/OQ-9; interface shapes AQ-6/AQ-7; enforcement budgets and integrity are SC-001/SC-004/SC-005/SC-009.
 
 ### OD-013
 
-- **Unresolved:** Route/map renderer, content formats, native presentation, and browser/embedded-web behavior are **UNKNOWN** or **TO BE DECIDED** (DESIGN.md DQ-2–DQ-6; ARCHITECTURE.md AQ-8). Web-oriented design tokens versus native presentation, and WCAG 2.2 AA contrast wording versus REQUIREMENTS.md OQ-6, remain recorded source mismatches.
-- **Evidence needed:** Design/requirements reconciliation of device and accessibility scope, plus architecture/design confirmation of renderer, content sinks, and any browser or embedded-web surface. Browser controls cannot be selected from a web-style design token or inherited React prompt alone.
-- **Affected:** SC-002, SC-011; output handling and any browser-specific controls.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: mobile/design maintainer.** DQ-2–DQ-6 own presentation and accessibility, AQ-8 owns renderer/host scope, SC-002/SC-011 own enforcement.
 
 ### OD-014
 
-- **Unresolved:** Map/weather/positioning sources, providers, formats, trust policy, permitted uses, destinations, and connectivity behavior are **UNKNOWN**; integration mechanisms are **TO BE DECIDED** (REQUIREMENTS.md Required Requirement Inputs/OQ-2; ARCHITECTURE.md AQ-3/AQ-5).
-- **Evidence needed:** Requirements confirming integration behavior and data use; architecture confirming external interfaces, accepted data and destination scope, provenance/update authority, and failure contracts. FR-2.1 confirms GPS-independent manual origin entry, not a particular positioning implementation.
-- **Affected:** SC-008, SC-010; external-input validation, outbound requests, location flows, and map provenance.
-- **Owner:** UNKNOWN.
+**RESOLVED. Owner: map/backend maintainer.** AQ-3/AQ-5 own sources and adapters; OQ-2/OQ-13/OQ-14 own their product behavior; SC-008/SC-010 enforce privacy and external-input boundaries.
+
+## Deferred Work
+
+### OD-015
+
+**DEFERRED — threat model, explicitly requested by the user. Owner: repository maintainer.** Do not create or update `THREAT_MODEL.md` in this change. No existing file or findings were present at inventory. Resume when the user requests threat modeling. This deferral blocks only threat finding creation, finding-to-control mappings and any claim of a completed threat-model review. It does not block the requirements, design, architecture, secure-coding work or this PR. No threat findings or review results are fabricated.
+
+## Control Coverage
+
+| Control | Product acceptance | Additional verification obligation |
+| --- | --- | --- |
+| SC-001 | AC-11, AC-12 | Transport, deadlines, admission and proxy tests |
+| SC-002 | AC-03, AC-10, AC-11 | Native credential and release-state tests |
+| SC-003 | Not applicable | Reopen OD-004 if scope changes |
+| SC-004 | AC-03, AC-06, AC-11 | Boundary fuzzing and response validation |
+| SC-005 | AC-07, AC-08, AC-10 | SQL, ownership and transaction tests |
+| SC-006 | Not applicable | Reopen OD-007 if scope changes |
+| SC-007 | AC-09 | Authorization matrix and role revocation |
+| SC-008 | AC-10 | Retention, logs and restore deletion replay |
+| SC-009 | AC-07, AC-08, AC-14 | Map publication and self-review controls |
+| SC-010 | AC-03, AC-14 | Import and outbound-adapter tests |
+| SC-011 | AC-06, AC-13, AC-14 | Rendering sink and link tests |
+| SC-012 | AC-09, AC-10 | Challenge/session abuse tests |
+| SC-013 | AC-12 | Infrastructure, restore and incident drill |
+| SC-014 | All release evidence | Dependency, compiler and binary checks |
+
+Threat-finding coverage is deferred only under OD-015. This table maps acceptance and control verification; it is not a substitute threat model.
